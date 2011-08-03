@@ -15,6 +15,9 @@ presented here, I would highly recommend the Open University book
 "Multivariate Analysis" (product code M249/03), available from
 from `the Open University Shop <http://www.ouw.co.uk/store/>`_.
 
+In the examples in this booklet, I will be using data sets from the UCI Machine
+Learning Repository, `http://archive.ics.uci.edu/ml <http://archive.ics.uci.edu/ml>`_.
+
 There is a pdf version of this booklet available at
 `https://github.com/avrilcoghlan/LittleBookofRTimeSeries/raw/master/_build/latex/MultivariateAnalysis.pdf <https://github.com/avrilcoghlan/LittleBookofRTimeSeries/raw/master/_build/latex/MultivariateAnalysis.pdf>`_.
 
@@ -29,12 +32,13 @@ and my booklet on using R for time series analysis,
 Reading Multivariate Analysis Data into R
 -----------------------------------------
 
-The first thing that you will want to do to analyse your time series data will be to read
-it into R, and to plot the time series. You can read data into R using the scan() function,
-which assumes that your data for successive time points is in a simple text file with one column. 
+The first thing that you will want to do to analyse your multivariate data will be to read
+it into R, and to plot the data. You can read data into R using the read.table() function.
 
-For example, the file `http://robjhyndman.com/tsdldata/misc/kings.dat <http://robjhyndman.com/tsdldata/misc/kings.dat>`_ contains data on the age of death of successive kings of England, starting
-with William the Conqueror (original source: Hipel and Mcleod, 1994). 
+For example, the file `http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data
+<http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data>`_
+contains data on concentrations of 13 different chemicals in wines grown in the same region in Italy that are
+derived from three different cultivars.
 
 The data set looks like this:
 
@@ -42,189 +46,87 @@ The data set looks like this:
 
 ::
 
-    Age of Death of Successive Kings of England
-    #starting with William the Conqueror
-    #Source: McNeill, "Interactive Data Analysis"
-    60
-    43
-    67
-    50
-    56
-    42
-    50
-    65
-    68
-    43
-    65
-    34
-    ...
+    1,14.23,1.71,2.43,15.6,127,2.8,3.06,.28,2.29,5.64,1.04,3.92,1065
+    1,13.2,1.78,2.14,11.2,100,2.65,2.76,.26,1.28,4.38,1.05,3.4,1050
+    1,13.16,2.36,2.67,18.6,101,2.8,3.24,.3,2.81,5.68,1.03,3.17,1185
+    1,14.37,1.95,2.5,16.8,113,3.85,3.49,.24,2.18,7.8,.86,3.45,1480
+    1,13.24,2.59,2.87,21,118,2.8,2.69,.39,1.82,4.32,1.04,2.93,735
+    ... 
 
+There is one row per wine sample.
+The first column contains the cultivar of a wine sample (labelled 1, 2 or 3), and the following thirteen columns
+contain the concentrations of the 13 different chemicals in that sample.
+The columns are separated by commas. 
 
-Only the first few lines of the file have been shown. The first three lines contain
-some comment on the data, and we want to ignore this when we read the data into R.
-We can use this by using the "skip" parameter of the scan() function, which specifies
-how many lines at the top of the file to ignore. To read the file into R, ignoring the
-first three lines, we type:
+When we read the file into R using the read.table() function, we need to use the "sep="
+argument in read.table() to tell it that the columns are separated by commas.
+That is, we can read in the file using the read.table() function as follows:
 
 .. highlight:: r
 
 ::
 
-    > kings <- scan("http://robjhyndman.com/tsdldata/misc/kings.dat",skip=3)
-      Read 42 items
-    > kings
-      [1] 60 43 67 50 56 42 50 65 68 43 65 34 47 34 49 41 13 35 53 56 16 43 69 59 48
-      [26] 59 86 55 68 51 33 49 67 77 81 67 71 81 68 70 77 56
-      
-In this case the age of death of 42 successive kings of England has been read into the
-variable 'kings'.
+    > wine <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", sep=",")
+    > wine
+         V1    V2   V3   V4   V5  V6   V7   V8   V9  V10       V11   V12  V13  V14
+     1    1 14.23 1.71 2.43 15.6 127 2.80 3.06 0.28 2.29  5.640000 1.040 3.92 1065
+     2    1 13.20 1.78 2.14 11.2 100 2.65 2.76 0.26 1.28  4.380000 1.050 3.40 1050
+     3    1 13.16 2.36 2.67 18.6 101 2.80 3.24 0.30 2.81  5.680000 1.030 3.17 1185
+     4    1 14.37 1.95 2.50 16.8 113 3.85 3.49 0.24 2.18  7.800000 0.860 3.45 1480
+     5    1 13.24 2.59 2.87 21.0 118 2.80 2.69 0.39 1.82  4.320000 1.040 2.93  735
+     ...
+     176  3 13.27 4.28 2.26 20.0 120 1.59 0.69 0.43 1.35 10.200000 0.590 1.56  835
+     177  3 13.17 2.59 2.37 20.0 120 1.65 0.68 0.53 1.46  9.300000 0.600 1.62  840
+     178  3 14.13 4.10 2.74 24.5  96 2.05 0.76 0.56 1.35  9.200000 0.610 1.60  560
+     
+In this case the data on 178 samples of wine has been read into the variable 'wine'.
 
-Once you have read the time series data into R, the next step is to store the data in
-a time series object in R, so that you can use R's many functions for analysing time series data.
-To store the data in a time series object, we use the ts() function in R. For example,
-to store the data in the variable 'kings' as a time series object in R, we type:
+Plotting Multivariate Data
+--------------------------
 
-.. highlight:: r
+Once you have read a multivariate data set into R, the next step is usually to make a plot of the data.
 
-::
+One common way of plotting multivariate data is to make a "matrix scatterplot", showing each pair of
+variables plotted against each other. We can use the "scatterplotMatrix()" function from the "car"
+R package to do this. To use this function, we first need to install the "car" R package 
+(for instructions on how to install an R package, see `How to install an R package 
+<./installr.html#how-to-install-an-r-package>`_).
 
-    > kingstimeseries <- ts(kings)
-    > kingstimeseries 
-      Time Series:
-      Start = 1 
-      End = 42 
-      Frequency = 1 
-      [1] 60 43 67 50 56 42 50 65 68 43 65 34 47 34 49 41 13 35 53 56 16 43 69 59 48
-      [26] 59 86 55 68 51 33 49 67 77 81 67 71 81 68 70 77 56
-
-Sometimes the time series data set that you have may have been collected at regular intervals that
-were less than one year, for example, monthly or quarterly. In this case, you can specify the number
-of times that data was collected per year by using the 'frequency' parameter in the ts() function. 
-For monthly time series data, you set frequency=12, while for quarterly time series data, you set 
-frequency=4. 
-
-You can also specify the first year that the data was collected, and the first interval
-in that year by using the 'start' parameter in the ts() function. For example, if the first
-data point corresponds to the second quarter of 1986, you would set start=c(1986,2). 
-
-An example is a data set of the number of births per month in New York city, from
-January 1946 to December 1959 (originally collected by Newton). This data is available
-in the file `http://robjhyndman.com/tsdldata/data/nybirths.dat 
-<http://robjhyndman.com/tsdldata/data/nybirths.dat>`_
-We can read the data into R, and store it as a time series object, by typing:
+Once you have installed the "car" R package, you can load the "car" R package by typing:
 
 .. highlight:: r
 
 ::
 
-    > births <- scan("http://robjhyndman.com/tsdldata/data/nybirths.dat")
-      Read 168 items
-    > birthstimeseries <- ts(births, frequency=12, start=c(1946,1))
-    > birthstimeseries
-        Jan    Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec
-      1946 26.663 23.598 26.931 24.740 25.806 24.364 24.477 23.901 23.175 23.227 21.672 21.870
-      1947 21.439 21.089 23.709 21.669 21.752 20.761 23.479 23.824 23.105 23.110 21.759 22.073
-      1948 21.937 20.035 23.590 21.672 22.222 22.123 23.950 23.504 22.238 23.142 21.059 21.573
-      1949 21.548 20.000 22.424 20.615 21.761 22.874 24.104 23.748 23.262 22.907 21.519 22.025
-      1950 22.604 20.894 24.677 23.673 25.320 23.583 24.671 24.454 24.122 24.252 22.084 22.991
-      1951 23.287 23.049 25.076 24.037 24.430 24.667 26.451 25.618 25.014 25.110 22.964 23.981
-      1952 23.798 22.270 24.775 22.646 23.988 24.737 26.276 25.816 25.210 25.199 23.162 24.707
-      1953 24.364 22.644 25.565 24.062 25.431 24.635 27.009 26.606 26.268 26.462 25.246 25.180
-      1954 24.657 23.304 26.982 26.199 27.210 26.122 26.706 26.878 26.152 26.379 24.712 25.688
-      1955 24.990 24.239 26.721 23.475 24.767 26.219 28.361 28.599 27.914 27.784 25.693 26.881
-      1956 26.217 24.218 27.914 26.975 28.527 27.139 28.982 28.169 28.056 29.136 26.291 26.987
-      1957 26.589 24.848 27.543 26.896 28.878 27.390 28.065 28.141 29.048 28.484 26.634 27.735
-      1958 27.132 24.924 28.963 26.589 27.931 28.009 29.229 28.759 28.405 27.945 25.912 26.619
-      1959 26.076 25.286 27.660 25.951 26.398 25.565 28.865 30.000 29.261 29.012 26.992 27.897   
+    > library("car")
 
-Similarly, the file `http://robjhyndman.com/tsdldata/data/fancy.dat 
-<http://robjhyndman.com/tsdldata/data/fancy.dat>`_ contains monthly sales for a souvenir
-shop at a beach resort town in Queensland, Australia, for January 1987-December 1993 (original
-data from Wheelwright and Hyndman, 1998). We can read the data into R by typing:
+You can then use the "scatterplotMatrix()" function to smooth time series data. 
 
-.. highlight:: r
+To use the scatterplotMatrix() function, you need to give it as its input the variables
+that you want included in the plot. Say for example, that we just want to include the
+variables corresponding to the concentrations of the first five chemicals. These are stored in 
+columns 2-6 of the variable "wine". We can extract just these columns from the variable
+"wine" by typing:
 
 ::
 
-    > souvenir <- scan("http://robjhyndman.com/tsdldata/data/fancy.dat")
-      Read 84 items
-    > souvenirtimeseries <- ts(souvenir, frequency=12, start=c(1987,1))
-    > souvenirtimeseries
-      Jan       Feb       Mar       Apr       May       Jun       Jul       Aug       Sep       Oct       Nov       Dec
-      1987   1664.81   2397.53   2840.71   3547.29   3752.96   3714.74   4349.61   3566.34   5021.82   6423.48   7600.60  19756.21
-      1988   2499.81   5198.24   7225.14   4806.03   5900.88   4951.34   6179.12   4752.15   5496.43   5835.10  12600.08  28541.72
-      1989   4717.02   5702.63   9957.58   5304.78   6492.43   6630.80   7349.62   8176.62   8573.17   9690.50  15151.84  34061.01
-      1990   5921.10   5814.58  12421.25   6369.77   7609.12   7224.75   8121.22   7979.25   8093.06   8476.70  17914.66  30114.41
-      1991   4826.64   6470.23   9638.77   8821.17   8722.37  10209.48  11276.55  12552.22  11637.39  13606.89  21822.11  45060.69
-      1992   7615.03   9849.69  14558.40  11587.33   9332.56  13082.09  16732.78  19888.61  23933.38  25391.35  36024.80  80721.71
-      1993  10243.24  11266.88  21826.84  17357.33  15997.79  18601.53  26155.15  28586.52  30505.41  30821.33  46634.38 104660.67
+    > wine[2:6]
+             V2   V3   V4   V5  V6  
+      1   14.23 1.71 2.43 15.6 127 
+      2   13.20 1.78 2.14 11.2 100
+      3   13.16 2.36 2.67 18.6 101 
+      4   14.37 1.95 2.50 16.8 113
+      5   13.24 2.59 2.87 21.0 118 
+      ...
 
-Plotting Time Series 
---------------------
-
-Once you have read a time series into R, the next step is usually to make a plot of the time series
-data, which you can do with the plot.ts() function in R.
-
-For example, to plot the time series of the age of death of 42 successive kings of England, we type:
-
-.. highlight:: r
+To make a matrix scatterplot of just these 13 variables using the scatterplotMatrix() function we type:
 
 ::
 
-    > plot.ts(kingstimeseries)
+    > scatterplotMatrix(wine[2:6])
+
 
 |image1|
-
-We can see from the time plot that this time series could probably be described using an additive
-model, since the random fluctuations in the data are roughly constant in size over time.
-
-Likewise, to plot the time series of the number of births per month in New York city, we type:
-
-.. highlight:: r
-
-::
-
-    > plot.ts(birthstimeseries)
-
-|image2|
-
-We can see from this time series that there seems to be seasonal variation in the number of
-births per month: there is a peak every summer, and a trough every winter. Again, it seems 
-that this time series could probably be described using an additive model, as the seasonal
-fluctuations are roughly constant in size over time and do not seem to depend on the level
-of the time series, and the random fluctuations also seem to be roughly constant in size over time.
-
-Similarly, to plot the time series of the monthly sales for the souvenir
-shop at a beach resort town in Queensland, Australia, we type:
-
-.. highlight:: r
-
-::
-
-    > plot.ts(souvenirtimeseries)
-
-|image4|
-
-In this case, it appears that an additive model is not appropriate for describing this
-time series, since the size of the seasonal fluctuations and random fluctuations seem
-to increase with the level of the time series. Thus, we may need to transform the
-time series in order to get a transformed time series that can be described using an
-additive model. For example, we can transform the time series by calculating
-the natural log of the original data:
-
-.. highlight:: r
-
-::
-
-    > logsouvenirtimeseries <- log(souvenirtimeseries)
-    > plot.ts(logsouvenirtimeseries)
-
-|image5|
-
-Here we can see that the size of the seasonal fluctuations and random fluctuations in
-the log-transformed time series seem to be roughly constant over time, and do not depend
-on the level of the time series. Thus, the log-transformed time series can probably be
-described using an additive model. 
 
 Links and Further Reading
 -------------------------
@@ -254,6 +156,10 @@ Many of the examples in this booklet are inspired by examples in the excellent O
 "Multivariate Analysis" (product code M249/03), 
 available from `the Open University Shop <http://www.ouw.co.uk/store/>`_.
 
+I am grateful to the UCI Machine Learning Repository, 
+`http://archive.ics.uci.edu/ml <http://archive.ics.uci.edu/ml>`_, for making data sets available
+which I have used in the examples in this booklet.
+
 Contact
 -------
 
@@ -267,45 +173,4 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
 <http://creativecommons.org/licenses/by/3.0/>`_.
 
 .. |image1| image:: ../_static/image1.png
-.. |image2| image:: ../_static/image2.png
-.. |image4| image:: ../_static/image4.png
-.. |image5| image:: ../_static/image5.png
-.. |image6| image:: ../_static/image6.png
-.. |image7| image:: ../_static/image7.png
-.. |image8| image:: ../_static/image8.png
-.. |image9| image:: ../_static/image9.png
-.. |image10| image:: ../_static/image10.png
-.. |image11| image:: ../_static/image11.png
-.. |image12| image:: ../_static/image12.png
-.. |image13| image:: ../_static/image13.png
-.. |image13| image:: ../_static/image13.png
-.. |image14| image:: ../_static/image14.png
-.. |image15| image:: ../_static/image15.png
-.. |image16| image:: ../_static/image16.png
-.. |image17| image:: ../_static/image17.png
-.. |image18| image:: ../_static/image18.png
-.. |image19| image:: ../_static/image19.png
-.. |image20| image:: ../_static/image20.png
-.. |image21| image:: ../_static/image21.png
-.. |image22| image:: ../_static/image22.png
-.. |image23| image:: ../_static/image23.png
-.. |image24| image:: ../_static/image24.png
-.. |image25| image:: ../_static/image25.png
-.. |image26| image:: ../_static/image26.png
-.. |image27| image:: ../_static/image27.png
-.. |image28| image:: ../_static/image28.png
-.. |image29| image:: ../_static/image29.png
-.. |image30| image:: ../_static/image30.png
-.. |image31| image:: ../_static/image31.png
-.. |image32| image:: ../_static/image32.png
-.. |image33| image:: ../_static/image33.png
-.. |image34| image:: ../_static/image34.png
-.. |image35| image:: ../_static/image35.png
-.. |image36| image:: ../_static/image36.png
-.. |image37| image:: ../_static/image37.png
-.. |image38| image:: ../_static/image38.png
-.. |image39| image:: ../_static/image39.png
-.. |image40| image:: ../_static/image40.png
-.. |image41| image:: ../_static/image41.png
-.. |image42| image:: ../_static/image42.png
 
