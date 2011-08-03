@@ -1,8 +1,8 @@
-Using R for Time Series Analysis 
-================================
+Using R for Multivariate Analysis
+=================================
 
-Time Series Analysis
---------------------
+Multivariate Analysis
+---------------------
 
 This booklet itells you how to use the R statistical software to carry out some simple multivariate analyses.
 
