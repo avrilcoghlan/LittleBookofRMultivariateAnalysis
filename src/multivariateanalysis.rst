@@ -180,8 +180,64 @@ lower values of V4 compared to the wines of cultivar 1.
 A Profile Plot
 ^^^^^^^^^^^^^^
 
-Another type of plot that is useful is a "profile plot", which shows 
+Another type of plot that is useful is a "profile plot", which shows the variation in each of the
+variables, by plotting the value of each of the variables for each of the samples. 
 
+The function "makeProfilePlot()" below can be used to make a profile plot. This function requires
+the "RColorBrewer" library:
+
+::
+
+    > makeProfilePlot <- function(mylist,names)
+      {
+         require(RColorBrewer)
+         # find out how many variables we want to include
+         numvariables <- length(mylist)   
+         # choose 'numvariables' random colours
+         colours <- brewer.pal(numvariables,"Set1")
+         # find out the minimum and maximum values of the variables:
+         mymin <- 1e+20
+         mymax <- 1e-20
+         for (i in 1:numvariables)
+         {
+            vectori <- mylist[[i]]
+            mini <- min(vectori)
+            maxi <- max(vectori)
+            if (mini < mymin) { mymin <- mini }
+            if (maxi > mymax) { mymax <- maxi }
+         }
+         # plot the variables
+         for (i in 1:numvariables)
+         {
+            vectori <- mylist[[i]]
+            namei <- names[i]
+            colouri <- colours[i]
+            if (i == 1) { plot(vectori,col=colouri,type="l",ylim=c(mymin,mymax)) }
+            else         { points(vectori, col=colouri,type="l")                                     }
+            lastxval <- length(vectori)
+            lastyval <- vectori[length(vectori)]
+            text((lastxval-10),(lastyval),namei,col="black",cex=0.6)
+         }
+      }
+
+To use this function, you first need to copy and paste it into R. The arguments to the
+function are a vector containing the names of the varibles that you want to plot, and
+a list variable containing the variables themselves. 
+
+For example, to make a profile plot of the concentrations of the first five chemicals in the wine samples
+(stored in columns V2, V3, V4, V5, V6 of variable "wine"), we type:
+
+::
+
+    > library(RColorBrewer)
+    > names <- c("V2","V3","V4","V5","V6")
+    > mylist <- list(wine$V2,wine$V3,wine$V4,wine$V5,wine$V6)
+    > makeProfilePlot(mylist,names)
+
+|image5|
+
+It is clear from the profile plot that the mean and standard deviation for V6 is
+quite a lot higher than that for the other variables.
 
 Calculating Summary Statistics for Multivariate Data
 ----------------------------------------------------
@@ -272,3 +328,6 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
             :width: 400
 .. |image4| image:: ../_static/image4.png
             :width: 400
+.. |image5| image:: ../_static/image5.png
+            :width: 500
+
