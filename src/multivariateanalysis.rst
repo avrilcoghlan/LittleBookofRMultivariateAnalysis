@@ -100,7 +100,7 @@ Once you have installed the "car" R package, you can load the "car" R package by
 
     > library("car")
 
-You can then use the "scatterplotMatrix()" function to smooth time series data. 
+You can then use the "scatterplotMatrix()" function to plot the multivariate data. 
 
 To use the scatterplotMatrix() function, you need to give it as its input the variables
 that you want included in the plot. Say for example, that we just want to include the
@@ -127,6 +127,49 @@ To make a matrix scatterplot of just these 13 variables using the scatterplotMat
 
 
 |image1|
+
+
+In this matrix scatterplot, the diagonal cells show histograms of each of the variables, in this
+case the concentrations of the first five chemicals (variables V2, V3, V4, V5, V6). 
+
+Each of the off-diagonal cells is a scatterplot of two of the five chemicals, for example, the second cell in the
+first row is a scatterplot of V2 (y-axis) against V3 (x-axis). 
+
+If you see an interesting scatterplot for two variables in the matrix scatterplot, you may want to
+plot that scatterplot in more detail, with the data points labelled by their group (their cultivar in this case).
+
+For example, in the matrix scatterplot above, the cell in the third column of the fourth row down is a scatterplot
+of V5 (x-axis) against V4 (y-axis). If you look at this scatterplot, it appears that there may be a 
+positive relationship between V5 and V4. 
+
+We may therefore decide to examine the relationship between V5 and V4 more closely, by plotting a scatterplot
+of these two variable, with the data points labelled by their group (their cultivar). To plot a scatterplot
+of two variables, we can use the "plot" R function. The V4 and V5 variables are stored in the columns
+V4 and V5 of the variable "wine", so can be accessed by typing wine$V4 or wine$V5. Therefore, to plot
+the scatterplot, we type:
+
+::
+
+    > plot(wine$V4, wine$V5)
+
+|image2|
+
+If we want to label the data points by their group (the cultivar of wine here), we can use the "text" function
+in R to plot some text beside every data point. In this case, the cultivar of wine is stored in the column
+V1 of the variable "wine", so we type:
+
+::
+
+    > text(wine$V4, wine$V5, wine$V1, cex=0.5, pos=4, col="red")
+
+If you look at the help page for the "text" function, you will see that "pos=4" will plot the text just to the
+right of the symbol for a data point. The "cex=0.5" option will plot the text at half the default size, and
+the "col=red" option will plot the text in red. This gives us the following plot:
+
+|image4|
+
+We can see from the scatterplot of V4 versus V5 that the wines from cultivar 2 seem to have
+lower values of V4 compared to the wines of cultivar 1. 
 
 Links and Further Reading
 -------------------------
@@ -173,4 +216,6 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
 <http://creativecommons.org/licenses/by/3.0/>`_.
 
 .. |image1| image:: ../_static/image1.png
+.. |image2| image:: ../_static/image2.png
+.. |image4| image:: ../_static/image4.png
 
