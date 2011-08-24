@@ -160,7 +160,7 @@ V1 of the variable "wine", so we type:
 
 ::
 
-    > text(wine$V4, wine$V5, wine$V1, cex=0.5, pos=4, col="red")
+    > text(wine$V4, wine$V5, wine$V1, cex=0.7, pos=4, col="red")
 
 If you look at the help page for the "text" function, you will see that "pos=4" will plot the text just to the
 right of the symbol for a data point. The "cex=0.5" option will plot the text at half the default size, and
@@ -216,6 +216,8 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
 <http://creativecommons.org/licenses/by/3.0/>`_.
 
 .. |image1| image:: ../_static/image1.png
+            :width: 900
 .. |image2| image:: ../_static/image2.png
+            :width: 500
 .. |image4| image:: ../_static/image4.png
-
+            :width: 500
