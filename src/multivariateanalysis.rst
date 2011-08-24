@@ -278,6 +278,233 @@ have very different standard deviations - the standard deviation of V14 is 314.9
 of V9 is just 0.1244533. Thus, in order to compare the variables, we need to standardise each variable so that
 it has a sample variance of 1 and sample mean of 0. 
 
+It is often interesting to calculate the means and standard deviations for just the samples
+from a particular group, for example, for the wine samples from each cultivar. The cultivar
+is stored in the column "V1" of the variable "wine".
+
+To extract out the data for just cultivar 2, we can type:
+
+::
+
+    > cultivar2wine <- wine[wine$V1=="2",] 
+
+We can then calculate the mean and standard deviations of the 13 chemicals' concentrations, for
+just the cultivar 2 samples:
+
+::
+
+    > mean(cultivar2wine[2:14])
+            V2         V3         V4         V5         V6         V7         V8         V9        V10        V11        V12 
+      12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845   0.363662   1.630282   3.086620   1.056282 
+            V13        V14 
+       2.785352 519.507042 
+    > sd(cultivar2wine[2:14]) 
+            V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
+      0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008   0.1239613   0.6020678   0.9249293 
+           V12         V13         V14 
+      0.2029368   0.4965735 157.2112204 
+
+You can calculate the mean and standard deviation of the 13 chemicals' concentrations for just cultivar 1 samples,
+or for just cultivar 3 samples, in a similar way.
+
+However, for convenience, you might want to use the function "printMeanAndSdByGroup()" below, which
+prints out the mean and standard deviation of the variables for each group in your data set:
+
+::
+
+    > printMeanAndSdByGroup <- function(variables,groupvariable)
+      {
+         # find out how many variables we have
+         numvariables <- length(variables)   
+         # find out how many values the group variable can take
+         groupvariable2 <- as.factor(groupvariable$V1)
+         levels <- levels(groupvariable2)
+         numlevels <- length(levels)
+         for (i in 1:numlevels)
+         {
+            leveli <- levels[i]
+            levelidata <- variables[groupvariable==leveli,]
+            print(paste("Group",leveli,"Means:"))
+            print(mean(levelidata))
+            print(paste("Group",leveli,"Standard Deviations:"))
+            print(sd(levelidata))
+         }
+      }
+
+To use the function "printMeanAndSdByGroup()", you first need to copy and paste it into R. The 
+arguments of the function are the variables that you want to calculate means and standard deviations for,
+and the variable containing the group of each sample. For example, to calculate the mean and standard deviation
+for each of the 13 chemical concentrations, for each of the three different wine cultivars, we type:
+
+::
+
+    > printMeanAndSdByGroup(wine[2:14],wine[1])
+      [1] "Group 1 Means:"
+         V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
+      13.744746    2.010678    2.455593   17.037288  106.338983    2.840169    2.982373    0.290000    1.899322    5.528305 
+         V12         V13         V14 
+       1.062034    3.157797 1115.711864 
+      [1] "Group 1 Standard Deviations:"
+         V2           V3           V4           V5           V6           V7           V8           V9          V10 
+      0.46212536   0.68854886   0.22716598   2.54632245  10.49894932   0.33896135   0.39749361   0.07004924   0.41210923 
+         V11          V12          V13          V14 
+      1.23857281   0.11648264   0.35707658 221.52076659 
+      [1] "Group 2 Means:"
+         V2         V3         V4         V5         V6         V7         V8         V9        V10        V11        V12 
+      12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845   0.363662   1.630282   3.086620   1.056282 
+         V13        V14 
+      2.785352 519.507042 
+      [1] "Group 2 Standard Deviations:"
+         V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
+      0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008   0.1239613   0.6020678   0.9249293 
+         V12         V13         V14 
+      0.2029368   0.4965735 157.2112204 
+      [1] "Group 3 Means:"
+         V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
+      13.1537500   3.3337500   2.4370833  21.4166667  99.3125000   1.6787500   0.7814583   0.4475000   1.1535417   7.3962500 
+         V12         V13         V14 
+      0.6827083   1.6835417 629.8958333 
+      [1] "Group 3 Standard Deviations:"
+         V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
+      0.5302413   1.0879057   0.1846902   2.2581609  10.8904726   0.3569709   0.2935041   0.1241396   0.4088359   2.3109421 
+         V12         V13         V14 
+      0.1144411   0.2721114 115.0970432 
+
+Calculating Correlations for Multivariate Data
+----------------------------------------------
+
+It is often of interest to investigate whether any of the variables in a multivariate data set are
+significantly correlated.
+
+To calculate the linear (Pearson) correlation coefficient for a pair of variables, you can use
+the "cor.test()" function in R. For example, to calculate the correlation coefficient for the first
+two chemicals' concentrations, V2 and V3, we type:
+
+::
+
+    > cor.test(wine$V2, wine$V3)
+      Pearson's product-moment correlation
+      data:  wine$V2 and wine$V3 
+      t = 1.2579, df = 176, p-value = 0.2101
+      alternative hypothesis: true correlation is not equal to 0 
+      95 percent confidence interval:
+      -0.05342959  0.23817474 
+      sample estimates:
+       cor 
+      0.09439694 
+
+This tells us that the correlation coefficient is about 0.094, which is a very weak correlation.
+Furthermore, the P-value for the statistical test of whether the correlation coefficient is 
+significantly different from zero is 0.21. This is much greater than 0.05 (which we can use here
+as a cutoff for statistical significance), so there is very weak evidence that that the correlation is non-zero.
+
+If you have a lot of variables, you can use "cor.test()" to calculate the correlation coefficient
+for each pair of variables, but you might be just interested in finding out what are the most highly
+correlated pairs of variables. For this you can use the function "mosthighlycorrelated()" below.
+
+The function "mosthighlycorrelated()" will print out the linear correlation coefficients for
+each pair of variables in your data set, in order of the correlation coefficient. This lets you see
+very easily which pair of variables are most highly correlated.
+
+::
+
+    > mosthighlycorrelated <- function(mydataframe,numtoreport)
+      {
+         # find the correlations
+         cormatrix <- cor(mydataframe)
+         # set the correlations on the diagonal or lower triangle to zero, so they will not be reported as the highest ones:
+         diag(cormatrix) <- 0
+         cormatrix[lower.tri(cormatrix)] <- 0
+         # find the dimensions of the matrix, and the row names:
+         numrows <- nrow(cormatrix)
+         therownames <- rownames(cormatrix)
+         # find the highest correlations
+         sorted <- sort(abs(cormatrix),decreasing=TRUE)
+         for (i in 1:numtoreport)
+         {
+            corri <- sorted[i]
+            # find the pair of variables with this correlation
+            for (j in 1:(numrows-1))
+            {
+               for (k in (j+1):numrows)
+               {
+                  corrjk <- cormatrix[j,k]
+                  if (corri == abs(corrjk))
+                  {
+                     rowname <- therownames[j]
+                     colname <- therownames[k]
+                     print(paste("i=",i,"variables",rowname,"and",colname,"correlation=",corrjk))
+                  }
+               }
+            }
+         }
+      }
+
+To use this function, you will first have to copy and paste it into R. The arguments of the function
+are the variables that you want to calculate the correlations for, and the number of top correlation
+coefficients to print out (for example, you can tell it to print out the largest ten correlation coefficients, or
+the largest 20).
+
+For example, to calculate correlation coefficients between the concentrations of the 13 chemicals
+in the wine samples, and to print out the top 10 pairwise correlation coefficients, you can type:
+
+::
+
+    > mosthighlycorrelated(wine[2:14], 10)
+      [1] "i= 1 variables V7 and V8 correlation= 0.864563500095115"
+      [1] "i= 2 variables V8 and V13 correlation= 0.787193901866952"
+      [1] "i= 3 variables V7 and V13 correlation= 0.699949364791186"
+      [1] "i= 4 variables V8 and V10 correlation= 0.652691768607515"
+      [1] "i= 5 variables V2 and V14 correlation= 0.643720037178213"
+      [1] "i= 6 variables V7 and V10 correlation= 0.612413083780036"
+      [1] "i= 7 variables V12 and V13 correlation= 0.565468293182659"
+      [1] "i= 8 variables V3 and V12 correlation= -0.561295688664945"
+      [1] "i= 9 variables V2 and V11 correlation= 0.546364195083704"
+      [1] "i= 10 variables V8 and V12 correlation= 0.54347856648999"
+
+This tells us that the pair of variables with the highest linear correlation coefficient are
+V7 and V8 (correlation = 0.86 approximately). 
+
+Standardising Variables
+-----------------------
+
+If you want to compare different variables that have different units, are very different variances,
+it is a good idea to first standardise the variables, so that each variable has a mean of 0 and
+a standard deviation of 1. 
+
+You can standardise variables in R using the "scale()" function. 
+
+For example, to standardise the concentrations of the 13 chemicals in the wine samples, we type:
+
+::
+
+    > standardisedconcentrations <- as.data.frame(scale(wine[2:14]))
+
+Note that we use the "as.data.frame()" function to convert the output of "scale()" into a
+"data frame", which is the same type of R variable that the "wine" variable.
+
+We can check that each of the standardised variables stored in "standardisedconcentrations"
+has a mean of 0 and a standard deviation of 1 by typing:
+
+::
+
+    > mean(standardisedconcentrations) 
+           V2            V3            V4            V5            V6            V7            V8            V9           V10 
+      -8.591766e-16 -6.776446e-17  8.045176e-16 -7.720494e-17 -4.073935e-17 -1.395560e-17  6.958263e-17 -1.042186e-16 -1.221369e-16 
+           V11           V12           V13           V14 
+      3.649376e-17  2.093741e-16  3.003459e-16 -1.034429e-16 
+    > sd(standardisedconcentrations)
+      V2  V3  V4  V5  V6  V7  V8  V9 V10 V11 V12 V13 V14 
+      1   1   1   1   1   1   1   1   1   1   1   1   1 
+
+We see that the means of the standardised variables are all very tiny numbers and so are
+essentially equal to 0, and the standard deviations of the standardised variables are all equal to 1.
+
+Principal Component Analysis
+----------------------------
+
+
+
 Links and Further Reading
 -------------------------
 
@@ -323,11 +550,11 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
 <http://creativecommons.org/licenses/by/3.0/>`_.
 
 .. |image1| image:: ../_static/image1.png
-            :width: 700
+            :width: 650
 .. |image2| image:: ../_static/image2.png
             :width: 400
 .. |image4| image:: ../_static/image4.png
             :width: 400
 .. |image5| image:: ../_static/image5.png
-            :width: 500
+            :width: 400
 
