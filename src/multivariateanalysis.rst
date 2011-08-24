@@ -239,6 +239,8 @@ For example, to make a profile plot of the concentrations of the first five chem
 It is clear from the profile plot that the mean and standard deviation for V6 is
 quite a lot higher than that for the other variables.
 
+xxx why did they do quite a different profile plot in the assignment answer?
+
 Calculating Summary Statistics for Multivariate Data
 ----------------------------------------------------
 
@@ -503,7 +505,53 @@ essentially equal to 0, and the standard deviations of the standardised variable
 Principal Component Analysis
 ----------------------------
 
+To carry out a principal component analysis on a multivariate data set, the first step is often to standardise
+the variables under study using the "scale()" function (see above).
 
+Once you have standardised your variables, you can carry out a principal component analysis using the "princomp()"
+function in R.
+
+For example, to standardise the concentrations of the 13 chemicals in the wine samples, and carry out a 
+principal components analysis on the standardised concentrations, we type:
+
+::
+
+    > standardisedconcentrations <- as.data.frame(scale(wine[2:14])) # standardise the variables
+    > wine.pca <- princomp(standardisedconcentrations)               # do a PCA
+
+You can get a summary of the principal component analysis results using the "summary()" function on the
+output of "princomp()":
+
+::
+
+    > summary(wine.pca)
+      Importance of components:
+                               Comp.1    Comp.2    Comp.3    Comp.4     Comp.5     Comp.6
+      Standard deviation     2.1631951 1.5757366 1.1991447 0.9559347 0.92110518 0.79878171
+      Proportion of Variance 0.3619885 0.1920749 0.1112363 0.0706903 0.06563294 0.04935823
+      Cumulative Proportion  0.3619885 0.5540634 0.6652997 0.7359900 0.80162293 0.85098116
+                               Comp.7     Comp.8     Comp.9    Comp.10    Comp.11
+      Standard deviation     0.74022473 0.58867607 0.53596364 0.49949266 0.47383559
+      Proportion of Variance 0.04238679 0.02680749 0.02222153 0.01930019 0.01736836
+      Cumulative Proportion  0.89336795 0.92017544 0.94239698 0.96169717 0.97906553
+                               Comp.12     Comp.13
+      Standard deviation     0.40966094 0.320619963
+      Proportion of Variance 0.01298233 0.007952149
+      Cumulative Proportion  0.99204785 1.000000000
+
+This gives us the standard deviation of each component, and the proportion of variance explained by
+each component. 
+
+
+xxx why is the standard deviation squared not equal to the variance ?
+xxx Write down the variances of each component and calculate the total variance explained by  
+    the components. Brieﬂy explain how the total variance relates to the number of variables in the analysis.
+
+The total variance explained by the components is the sum of the variances of the components.
+This should be equal to the number of standardised variables (there are 13 variables). This is because for 
+standardised data, the variance of each standardised variable is 1. The total variance is equal to the sum 
+of the variances of the individual variables, and since the variance of each standardised variable is 1, the 
+total variance should be equal to the  number of variables (13 here). xxx is this true?
 
 Links and Further Reading
 -------------------------
