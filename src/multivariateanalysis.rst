@@ -86,6 +86,9 @@ Plotting Multivariate Data
 
 Once you have read a multivariate data set into R, the next step is usually to make a plot of the data.
 
+A Matrix Scatterplot
+^^^^^^^^^^^^^^^^^^^^
+
 One common way of plotting multivariate data is to make a "matrix scatterplot", showing each pair of
 variables plotted against each other. We can use the "scatterplotMatrix()" function from the "car"
 R package to do this. To use this function, we first need to install the "car" R package 
@@ -135,6 +138,9 @@ case the concentrations of the first five chemicals (variables V2, V3, V4, V5, V
 Each of the off-diagonal cells is a scatterplot of two of the five chemicals, for example, the second cell in the
 first row is a scatterplot of V2 (y-axis) against V3 (x-axis). 
 
+A Scatterplot with the Data Points Labelled by their Group
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 If you see an interesting scatterplot for two variables in the matrix scatterplot, you may want to
 plot that scatterplot in more detail, with the data points labelled by their group (their cultivar in this case).
 
@@ -170,6 +176,51 @@ the "col=red" option will plot the text in red. This gives us the following plot
 
 We can see from the scatterplot of V4 versus V5 that the wines from cultivar 2 seem to have
 lower values of V4 compared to the wines of cultivar 1. 
+
+A Profile Plot
+^^^^^^^^^^^^^^
+
+Another type of plot that is useful is a "profile plot", which shows 
+
+
+Calculating Summary Statistics for Multivariate Data
+----------------------------------------------------
+
+Another thing that you are likely to want to do is to calculate summary statistics such as the
+mean and standard deviation for each of the variables in your multivariate data set.
+
+This is easy to do, using the "mean()" and "sd()" functions in R. For example, say we want
+to calculate the mean and standard deviations of each of the 13 chemical concentrations in the
+wine samples. These are stored in columns 2-14 of the variable "wine". So we type:
+
+::
+
+    > mean(wine[2:14]) 
+              V2          V3          V4          V5          V6          V7 
+      13.0006180   2.3363483   2.3665169  19.4949438  99.7415730   2.2951124 
+              V8          V9         V10         V11         V12         V13 
+       2.0292697   0.3618539   1.5908989   5.0580899   0.9574494   2.6116854 
+              V14 
+     746.8932584 
+      
+This tells us that the mean of variable V2 is 13.0006180, the mean of V3 is 2.3363483, and so on.
+
+Similarly, to get the standard deviations of the 13 chemical concentrations, we type:
+
+::
+
+    > sd(wine[2:14]) 
+              V2          V3          V4          V5          V6          V7 
+       0.8118265   1.1171461   0.2743440   3.3395638  14.2824835   0.6258510 
+              V8          V9         V10         V11         V12         V13 
+       0.9988587   0.1244533   0.5723589   2.3182859   0.2285716   0.7099904 
+              V14 
+     314.9074743 
+
+We can see here that it would make sense to standardise in order to compare the variables because the variables
+have very different standard deviations - the standard deviation of V14 is 314.9074743, while the standard deviation
+of V9 is just 0.1244533. Thus, in order to compare the variables, we need to standardise each variable so that
+it has a sample variance of 1 and sample mean of 0. 
 
 Links and Further Reading
 -------------------------
@@ -216,8 +267,8 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
 <http://creativecommons.org/licenses/by/3.0/>`_.
 
 .. |image1| image:: ../_static/image1.png
-            :width: 900
+            :width: 700
 .. |image2| image:: ../_static/image2.png
-            :width: 500
+            :width: 400
 .. |image4| image:: ../_static/image4.png
-            :width: 500
+            :width: 400
