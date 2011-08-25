@@ -568,7 +568,11 @@ This is because for standardised data, the variance of each standardised variabl
 of the variances of the individual variables, and since the variance of each standardised variable is 1, the 
 total variance should be equal to the  number of variables (13 here). 
 
-It is common to summarise the results of a principal components analysis by making a scree plot, which we
+Deciding How Many Principal Components to Retain
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In order to decide how many principal components should be retained, 
+it is common to summarise the results of a principal components analysis by making a scree plot, which we
 can do in R using the "screeplot()" function:
 
 ::
@@ -603,6 +607,127 @@ components required to explain at least some minimum amount of the total varianc
 it is important to explain at least 80% of the variance, we would retain the first five principal components,
 as we can see from the output of "summary(wine.pca)" that the first five principal components
 explain 80.2% of the variance (while the first four components explain just 73.6%, so are not sufficient).
+
+Loadings for the Principal Components
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The loadings for the principal components are stored in a named element "loadings" of the variable
+returned by "princomp()". This contains a matrix with the loadings of each principal component, where
+the first column in the matrix contains the loadings for the first principal component, the second
+column contains the loadings for the second principal component, and so on.
+
+Therefore, to obtain the loadings for the first principal component in our
+analysis of the 13 chemical concentrations in wine samples, we type:
+
+::
+
+    > wine.pca$loadings[,1]
+             V2           V3           V4           V5           V6           V7           V8           V9 
+      -0.144329395  0.245187580  0.002051061  0.239320405 -0.141992042 -0.394660845 -0.422934297  0.298533103 
+             V10          V11          V12          V13          V14 
+      -0.313429488  0.088616705 -0.296714564 -0.376167411 -0.286752227
+
+The first principal component has highest (in absolute value) loadings for V8 (-0.423), V7 (-0.395), V13 (-0.376),
+V10 (-0.313), V12 (-0.297), V14 (-0.287), V9 (0.299), V3 (0.245), and V5 (0.239). The loadings for V8, V7, V13,
+V10, V12 and V14 are negative, while those for V9, V3, and V5 are positive. Therefore, an interpretation of the
+first principal component is that it represents a contrast between the concentrations of V8, V7, V13, V10, V12, and V14,
+and the concentrations of V9, V3 and V5.
+
+Similarly, we can obtain the loadings for the second principal component by typing:
+
+::
+
+    > wine.pca$loadings[,2]
+             V2           V3           V4           V5           V6           V7           V8           V9 
+      -0.483651548 -0.224930935 -0.316068814  0.010590502 -0.299634003 -0.065039512  0.003359812 -0.028779488 
+             V10          V11          V12          V13          V14 
+      -0.039301722 -0.529995672  0.279235148  0.164496193 -0.364902832 
+      
+The second principal component has highest loadings for V11 (-0.530), V2 (-0.484), V14 (-0.365), V4 (-0.316), 
+V6 (-0.300), V12 (0.279), and V3 (-0.225). The loadings for V11, V2, V14, V4, V6 and V3 are negative, while
+the loading for V12 is positive. Therefore, an interpretation of the second principal component is that
+it represents a contrast between the concentrations of V11, V2, V14, V4, V6 and V3, and the concentration of
+V12. Note that the loadings for V11 (-0.530) and V2 (-0.484) are the largest, so the contrast is mainly between
+the concentrations of V11 and V2, and the concentration of V12.
+
+Scatterplots of the Principal Components
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The values of the principal components are stored in a named element "scores" of the variable returned by
+"princomp()". This contains a matrix with the principal components, where the first column in the matrix
+contains the first principal component, the second column the second component, and so on.
+
+Thus, in our example, "wine.pca$scores[,1]" contains the first principal component, and 
+"wine.pca$scores[,2]" contains the second principal component. We can therefore make a scatterplot
+of the first two principal components, and label the data points with the cultivar that the wine
+samples come from, by typing:
+
+::
+
+    > plot(wine.pca$scores[,1],wine.pca$scores[,2]) # make a scatterplot
+    > text(wine.pca$scores[,1],wine.pca$scores[,2], wine$V1, cex=0.7, pos=4, col="red") # add labels
+
+|image7|
+
+The scatterplot shows the first principal component on the x-axis, and the second principal
+component on the y-axis. We can see from the scatterplot that wine samples of cultivar 1
+have much lower values of the first principal component than wine samples of cultivar 3.
+Therefore, the first principal component separates wine samples of cultivars 1 from those
+of cultivar 3.
+
+We can also see that wine samples of cultivar 2 have much higher values of the second
+principal component than wine samples of cultivars 1 and 3. Therefore, the second principal
+component separates samples of cultivar 2 from samples of cultivars 1 and 3.
+
+Therefore, the first two principal components are reasonably useful for distinguishing wine
+samples of the three different cultivars.
+
+Above, we interpreted the first principal component as a contrast between the concentrations of V8, V7, V13, V10, V12, and V14,
+and the concentrations of V9, V3 and V5. We can check whether this makes sense in terms of the
+concentrations of these chemicals in the different cultivars, by printing out the means of the
+standardised concentration variables in each cultivar, using the "printMeanAndSdByGroup()" function (see above): 
+
+::
+
+    > printMeanAndSdByGroup(standardisedconcentrations,wine[1])
+      [1] "Group 1 Means:"
+           V2         V3         V4         V5         V6         V7         V8         V9        V10 
+      0.9166093 -0.2915199  0.3246886 -0.7359212  0.4619232  0.8709055  0.9541923 -0.5773564  0.5388633 
+           V11        V12        V13        V14 
+      0.2028288  0.4575567  0.7691811  1.1711967 
+      [1] "Group 2 Means:"
+           V2          V3          V4          V5          V6          V7          V8          V9 
+      -0.88921161 -0.36134241 -0.44370614  0.22250941 -0.36354162 -0.05790375  0.05163434  0.01452785 
+           V10         V11         V12         V13         V14 
+      0.06880790 -0.85039994  0.43239084  0.24460431 -0.72207310 
+      [1] "Group 3 Means:"
+           V2          V3          V4          V5          V6          V7          V8          V9 
+       0.18862653  0.89281222  0.25721896  0.57544128 -0.03004191 -0.98483874 -1.24923710  0.68817813 
+           V10         V11         V12         V13         V14 
+      -0.76413110  1.00857281 -1.20199161 -1.30726231 -0.37152953 
+ 
+Does it make sense that the first principal component can separate cultivar 1 from cultivar 3?
+In cultivar 1, the mean values of V8 (0.954), V7 (0.871), V13 (0.769), V10 (0.539), V12 (0.458) and V14 (1.171)
+are very high compared to the mean values of V9 (-0.577), V3 (-0.292) and V5 (-0.736).
+In cultivar 3, the mean values of V8 (-1.249), V7 (-0.985), V13 (-1.307), V10 (-0.764), V12 (-1.202) and V14 (-0.372)
+are very low compared to the mean values of V9 (0.688), V3 (0.893) and V5 (0.575). 
+Therefore, it does make sense that principal component 1 is a contrast between the concentrations of V8, V7, V13, V10, V12, and V14,
+and the concentrations of V9, V3 and V5; and that principal component 1 can separate cultivar 1 from cultivar 3.
+
+
+
+
+xxx
+
+
+
+
+
+
+
+% xxx Do your answers to part (a)(iv) make sense in light of your interpretation of the ﬁrst two principal components (based on 
+% standardized data) in part (a)(iii)? Brieﬂy explain why or why not.
+
 
 Links and Further Reading
 -------------------------
@@ -658,4 +783,5 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
             :width: 400
 .. |image6| image:: ../_static/image6.png
             :width: 400
-
+.. |image7| image:: ../_static/image7.png
+            :width: 400
