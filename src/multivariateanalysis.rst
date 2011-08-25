@@ -505,8 +505,10 @@ essentially equal to 0, and the standard deviations of the standardised variable
 Principal Component Analysis
 ----------------------------
 
-To carry out a principal component analysis on a multivariate data set, the first step is often to standardise
-the variables under study using the "scale()" function (see above).
+To carry out a principal component analysis (PCA) on a multivariate data set, the first step is often to standardise
+the variables under study using the "scale()" function (see above). This is necessary if the input variables
+have very different variances, which is true in this case as the concentrations of the 13 chemicals have
+very different variances (see above).
 
 Once you have standardised your variables, you can carry out a principal component analysis using the "princomp()"
 function in R.
@@ -517,7 +519,10 @@ principal components analysis on the standardised concentrations, we type:
 ::
 
     > standardisedconcentrations <- as.data.frame(scale(wine[2:14])) # standardise the variables
-    > wine.pca <- princomp(standardisedconcentrations)               # do a PCA
+    > wine.pca <- princomp(standardisedconcentrations,cor="TRUE")    # do a PCA
+
+Note that the "cor=TRUE" argument in "princomp()" ensures that in the results reported, the 
+sum of the variances of the principal components is equal to the number of standardised variables (13 here).
 
 You can get a summary of the principal component analysis results using the "summary()" function on the
 output of "princomp()":
@@ -526,32 +531,78 @@ output of "princomp()":
 
     > summary(wine.pca)
       Importance of components:
-                               Comp.1    Comp.2    Comp.3    Comp.4     Comp.5     Comp.6
-      Standard deviation     2.1631951 1.5757366 1.1991447 0.9559347 0.92110518 0.79878171
-      Proportion of Variance 0.3619885 0.1920749 0.1112363 0.0706903 0.06563294 0.04935823
-      Cumulative Proportion  0.3619885 0.5540634 0.6652997 0.7359900 0.80162293 0.85098116
-                               Comp.7     Comp.8     Comp.9    Comp.10    Comp.11
-      Standard deviation     0.74022473 0.58867607 0.53596364 0.49949266 0.47383559
-      Proportion of Variance 0.04238679 0.02680749 0.02222153 0.01930019 0.01736836
-      Cumulative Proportion  0.89336795 0.92017544 0.94239698 0.96169717 0.97906553
-                               Comp.12     Comp.13
-      Standard deviation     0.40966094 0.320619963
-      Proportion of Variance 0.01298233 0.007952149
-      Cumulative Proportion  0.99204785 1.000000000
+                               Comp.1    Comp.2    Comp.3    Comp.4     Comp.5
+      Standard deviation     2.1692972 1.5801816 1.2025273 0.9586313 0.92370351
+      Proportion of Variance 0.3619885 0.1920749 0.1112363 0.0706903 0.06563294
+      Cumulative Proportion  0.3619885 0.5540634 0.6652997 0.7359900 0.80162293
+                               Comp.6     Comp.7     Comp.8     Comp.9    Comp.10
+      Standard deviation     0.80103498 0.74231281 0.59033665 0.53747553 0.50090167
+      Proportion of Variance 0.04935823 0.04238679 0.02680749 0.02222153 0.01930019
+      Cumulative Proportion  0.85098116 0.89336795 0.92017544 0.94239698 0.96169717
+                               Comp.11    Comp.12     Comp.13
+      Standard deviation     0.47517222 0.41081655 0.321524394
+      Proportion of Variance 0.01736836 0.01298233 0.007952149
+      Cumulative Proportion  0.97906553 0.99204785 1.000000000
 
 This gives us the standard deviation of each component, and the proportion of variance explained by
-each component. 
+each component. The standard deviation of the components is stored in a named element called "sdev" of the output 
+variable made by "princomp":
 
+::
 
-xxx why is the standard deviation squared not equal to the variance ?
-xxx Write down the variances of each component and calculate the total variance explained by  
-    the components. Brießy explain how the total variance relates to the number of variables in the analysis.
+    > wine.pca$sdev
+         Comp.1    Comp.2    Comp.3    Comp.4    Comp.5    Comp.6    Comp.7    Comp.8 
+      2.1692972 1.5801816 1.2025273 0.9586313 0.9237035 0.8010350 0.7423128 0.5903367 
+        Comp.9   Comp.10   Comp.11   Comp.12   Comp.13 
+      0.5374755 0.5009017 0.4751722 0.4108165 0.3215244 
 
-The total variance explained by the components is the sum of the variances of the components.
-This should be equal to the number of standardised variables (there are 13 variables). This is because for 
-standardised data, the variance of each standardised variable is 1. The total variance is equal to the sum 
+The total variance explained by the components is the sum of the variances of the components:
+
+::
+
+    > sum((wine.pca$sdev)^2)
+      [1] 13
+    
+In this case, we see that the total variance is 13, which is equal to the number of standardised variables (13 variables). 
+This is because for standardised data, the variance of each standardised variable is 1. The total variance is equal to the sum 
 of the variances of the individual variables, and since the variance of each standardised variable is 1, the 
-total variance should be equal to the  number of variables (13 here). xxx is this true?
+total variance should be equal to the  number of variables (13 here). 
+
+It is common to summarise the results of a principal components analysis by making a scree plot, which we
+can do in R using the "screeplot()" function:
+
+::
+
+    > screeplot(wine.pca, type="lines")
+
+|image6|
+
+The most obvious change in slope in the scree plot occurs at component 4, which is the "elbow" of the
+scree plot. Therefore, it cound be argued based on the basis of the scree plot that the first three
+components should be retained.
+
+Another way of deciding how many components to retain is to use Kaiser's criterion:
+that we should only retain principal components for which the variance is above 1 (when principal
+component analysis was applied to standardised data).  We can check this by finding the variance of each
+of the principal components:
+
+::
+
+    > (wine.pca$sdev)^2
+       Comp.1    Comp.2    Comp.3    Comp.4    Comp.5    Comp.6    Comp.7    Comp.8 
+     4.7058503 2.4969737 1.4460720 0.9189739 0.8532282 0.6416570 0.5510283 0.3484974 
+       Comp.9   Comp.10   Comp.11   Comp.12   Comp.13 
+     0.2888799 0.2509025 0.2257886 0.1687702 0.1033779 
+
+We see that the variance is above 1 for principal components 1, 2, and 3 (which have variances
+4.71, 2.50, and 1.45, respectively). Therefore, using Kaiser's criterion, we would retain the first
+three principal components.
+
+A third way to decide how many principal components to retain is to decide to keep the number of
+components required to explain at least some minimum amount of the total variance. For example, if
+it is important to explain at least 80% of the variance, we would retain the first five principal components,
+as we can see from the output of "summary(wine.pca)" that the first five principal components
+explain 80.2% of the variance (while the first four components explain just 73.6%, so are not sufficient).
 
 Links and Further Reading
 -------------------------
@@ -604,5 +655,7 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
 .. |image4| image:: ../_static/image4.png
             :width: 400
 .. |image5| image:: ../_static/image5.png
+            :width: 400
+.. |image6| image:: ../_static/image6.png
             :width: 400
 
