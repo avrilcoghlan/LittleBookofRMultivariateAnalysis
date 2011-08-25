@@ -323,6 +323,7 @@ prints out the mean and standard deviation of the variables for each group in yo
     > printMeanAndSdByGroup <- function(variables,groupvariable)
       {
          # find out how many variables we have
+         variables <- as.data.frame(variables)
          numvariables <- length(variables)   
          # find out how many values the group variable can take
          groupvariable2 <- as.factor(groupvariable[[1]])
@@ -1188,8 +1189,8 @@ it is not perfect.
 Thus, we see that two discriminant functions are necessary to separate the cultivars, as was
 discussed above (see the discussion of percentage separation above).
 
-Scatterplots of the Principal Components
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Scatterplots of the Discriminant Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We can obtain a scatterplot of the best two discriminant functions, with the data points labelled by cultivar, by typing:
 
@@ -1213,6 +1214,117 @@ discriminant functions together, since the first discriminant function can separ
 and the second discriminant function can separate cultivars 1 and 2, and cultivars 2 and 3, reasonably well.
 
 xxx Note: in SPSS I get different values of the LDA than in R, I think because I have different loadings xxx
+
+Allocation Rules and Misclassification Rate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We can calculate the mean values of the discriminant functions for each of the three cultivars using the
+"printMeanAndSdByGroup()" function (see above):
+
+::
+
+    > printMeanAndSdByGroup(wine.lda.values$x,wine[1])
+      [1] "Group 1 Means:"
+           LD1       LD2 
+      -3.615421  1.620929 
+      [1] "Group 2 Means:"
+           LD1        LD2 
+      -0.4993242 -2.7156185
+      [1] "Group 3 Means:"
+           LD1      LD2 
+      4.114745 1.094689 
+
+We find that the mean value of the first discriminant function is -3.615421 for cultivar 1, -0.4993242 for cultivar 2,
+and 4.114745 for cultivar 3. The mid-way point between the mean values for cultivars 1 and 2 is (-3.615421-0.4993242)/2=-2.057373,
+and the mid-way point between the mean values for cultivars 2 and 3 is (-0.4993242+4.114745)/2 = 1.807710.
+
+Therefore, we can use the following allocation rule:
+* if the first discriminant function is <= -2.057373, predict the sample to be from cultivar 1
+* if the first discriminant function is > -2.057373 and <= 1.807710, predict the sample to be from cultivar 2
+* if the first discriminant function is > 1.807710, predict the sample to be from cultivar 3
+
+We can examine the accuracy of this allocation rule by using the "calcAllocationRuleAccuracy()" function below:
+
+::
+
+    > calcAllocationRuleAccuracy <- function(ldavalue, groupvariable, cutoffpoints)
+      {
+         # find out how many values the group variable can take
+         groupvariable2 <- as.factor(groupvariable[[1]])
+         levels <- levels(groupvariable2)
+         numlevels <- length(levels)
+         # calculate the number of true positives and false negatives for each group
+         numlevels <- length(levels)
+         for (i in 1:numlevels)
+         {
+            leveli <- levels[i]
+            levelidata <- ldavalue[groupvariable==leveli]
+            # see how many of the samples from this group are classified in each group
+            for (j in 1:numlevels)
+            {
+               levelj <- levels[j]
+               if (j == 1) 
+               { 
+                  cutoff1 <- cutoffpoints[1]
+                  cutoff2 <- "NA"
+                  results <- summary(levelidata <= cutoff1)
+               }
+               else if (j == numlevels)
+               {
+                  cutoff1 <- cutoffpoints[(numlevels-1)]
+                  cutoff2 <- "NA"
+                  results <- summary(levelidata > cutoff1) 
+               }
+               else
+               {
+                  cutoff1 <- cutoffpoints[(j-1)]
+                  cutoff2 <- cutoffpoints[(j)]
+                  results <- summary(levelidata > cutoff1 & levelidata <= cutoff2)
+               }
+               trues <- results["TRUE"]
+               trues <- trues[[1]]
+               print(paste("Number of samples of group",leveli,"classified as group",levelj," : ",trues,"(cutoffs:",cutoff1,",",cutoff2,")"))
+            }
+         }
+      }
+
+For example, to calculate the accuracy for the wine data based on the allocation
+rule for the first discriminant function, we type:
+
+::
+
+    > calcAllocationRuleAccuracy(wine.lda.values$x[,1], wine[1], c(-2.057373, 1.807710))
+      [1] "Number of samples of group 1 classified as group 1  :  55 (cutoffs: -2.057373 , NA )"
+      [1] "Number of samples of group 1 classified as group 2  :  4 (cutoffs: -2.057373 , 1.80771 )"
+      [1] "Number of samples of group 1 classified as group 3  :  NA (cutoffs: 1.80771 , NA )"
+      [1] "Number of samples of group 2 classified as group 1  :  7 (cutoffs: -2.057373 , NA )"
+      [1] "Number of samples of group 2 classified as group 2  :  63 (cutoffs: -2.057373 , 1.80771 )"
+      [1] "Number of samples of group 2 classified as group 3  :  1 (cutoffs: 1.80771 , NA )"
+      [1] "Number of samples of group 3 classified as group 1  :  NA (cutoffs: -2.057373 , NA )"
+      [1] "Number of samples of group 3 classified as group 2  :  NA (cutoffs: -2.057373 , 1.80771 )"
+      [1] "Number of samples of group 3 classified as group 3  :  48 (cutoffs: 1.80771 , NA )"
+
+This can be displayed in a "confusion matrix":
+
++------------+----------------------+----------------------+----------------------+
+|            | Allocated to group 1 | Allocated to group 2 | Allocated to group 3 |
++============+======================+======================+======================+
+| Is group 1 |        55            |         4            |         0            |
++------------+----------------------+----------------------+----------------------+
+| Is group 2 |         7            |        63            |         1            |
++------------+----------------------+----------------------+----------------------+
+| Is group 3 |         0            |         0            |        48            |
++------------+----------------------+----------------------+----------------------+
+
+There are 4+7+1=12 wine samples that are misclassified, out of (55+4+7+63+1+48=) 178 wine samples: 
+4 samples from cultivar 1 are predicted to be from cultivar 2, 7 samples from cultivar 2 are predicted 
+to be from cultivar 1, and 1 sample from cultivar 2 is predicted to be from cultivar 3.
+Therefore, the misclassification rate is 12/178, or 6.74%. The misclassification rate is quite low,
+and therefore the accuracy of the allocation rule appears to be relatively high.
+
+However, this is probably an underestimate of the misclassification rate, as the allocation rule was based on this data (this is
+the "training set"). If we calculated the misclassification rate for a separate "test set" consisting of data other than that
+used to make the allocation rule, we would probably get a higher estimate of the misclassification rate.
 
 Links and Further Reading
 -------------------------
