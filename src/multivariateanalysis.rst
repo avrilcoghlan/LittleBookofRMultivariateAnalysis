@@ -497,6 +497,7 @@ you can use the function "calcSeparations()" below:
     > calcSeparations <- function(variables,groupvariable)
       {
          # find out how many variables we have
+         variables <- as.data.frame(variables)
          numvariables <- length(variables)
          # find the variable names
          variablenames <- colnames(variables)
@@ -508,7 +509,7 @@ you can use the function "calcSeparations()" below:
             Vw <- calcWithinGroupsVariance(variablei, groupvariable)
             Vb <- calcBetweenGroupsVariance(variablei, groupvariable)
             sep <- Vb/Vw
-            print(paste("variable",variablename,"separation=",sep))
+            print(paste("variable",variablename,"Vw=",Vw,"Vb=",Vb,"separation=",sep))
          }
       }
 
@@ -519,19 +520,19 @@ For example, to calculate the separations for each of the 13 chemical concentrat
 ::
 
     > calcSeparations(wine[2:14],wine[1])
-      [1] "variable V2 separation= 1.54374427706057"
-      [1] "variable V3 separation= 0.422210571007813"
-      [1] "variable V4 separation= 0.152147442285612"
-      [1] "variable V5 separation= 0.408818713226392"
-      [1] "variable V6 separation= 0.142052392435999"
-      [1] "variable V7 separation= 1.07123439566134"
-      [1] "variable V8 separation= 2.67343854493199"
-      [1] "variable V9 separation= 0.315147624536753"
-      [1] "variable V10 separation= 0.345958664802601"
-      [1] "variable V11 separation= 1.37901735361146"
-      [1] "variable V12 separation= 1.157906233032"
-      [1] "variable V13 separation= 2.17111223518731"
-      [1] "variable V14 separation= 2.37623284459632"
+      [1] "variable V2 Vw= 0.262052469153907 Vb= 0.404541999545934 separation= 1.54374427706057"
+      [1] "variable V3 Vw= 0.887546796746581 Vb= 0.37473163985053 separation= 0.422210571007813"
+      [1] "variable V4 Vw= 0.0660721013425184 Vb= 0.0100527012256999 separation= 0.152147442285612"
+      [1] "variable V5 Vw= 8.00681118121156 Vb= 3.2733342441496 separation= 0.408818713226392"
+      [1] "variable V6 Vw= 180.65777316441 Vb= 25.6628688901645 separation= 0.142052392435999"
+      [1] "variable V7 Vw= 0.191270475224227 Vb= 0.204895511934682 separation= 1.07123439566134"
+      [1] "variable V8 Vw= 0.274707514337437 Vb= 0.734413657412161 separation= 2.67343854493199"
+      [1] "variable V9 Vw= 0.0119117022132797 Vb= 0.00375394465670427 separation= 0.315147624536753"
+      [1] "variable V10 Vw= 0.246172943795542 Vb= 0.0851656629460314 separation= 0.345958664802601"
+      [1] "variable V11 Vw= 2.28492308133354 Vb= 3.15094858082634 separation= 1.37901735361146"
+      [1] "variable V12 Vw= 0.0244876469432414 Vb= 0.0283543990278662 separation= 1.157906233032"
+      [1] "variable V13 Vw= 0.160778729560982 Vb= 0.349068666907718 separation= 2.17111223518731"
+      [1] "variable V14 Vw= 29707.6818705169 Vb= 70592.3693975409 separation= 2.37623284459632"
 
 xxx should probably say something about the interpretation of these values.
 
@@ -816,8 +817,10 @@ analysis of the 13 chemical concentrations in wine samples, we type:
       -0.313429488  0.088616705 -0.296714564 -0.376167411 -0.286752227
 
 This means that the first principal component is a linear combination of the variables:
--0.144*V2 + 0.245*V3 + 0.002*V4 + 0.239*V5 - 0.142*V6 - 0.395*V7 - 0.423*V8 + 0.299*V9
--0.313*V10 + 0.089*V11 - 0.297*V12 - 0.376*V13 - 0.287*V14.
+-0.144*Z2 + 0.245*Z3 + 0.002*Z4 + 0.239*Z5 - 0.142*Z6 - 0.395*Z7 - 0.423*Z8 + 0.299*Z9
+-0.313*Z10 + 0.089*Z11 - 0.297*Z12 - 0.376*Z13 - 0.287*Z14, where Z2, Z3, Z4...Z14 are
+the standardised versions of the variables V2, V3, V4...V14 (that each
+have mean of 0 and variance of 1).
 
 Note that the square of the loadings sum to 1, as this is a constraint used in calculating the loadings:
 
@@ -825,6 +828,65 @@ Note that the square of the loadings sum to 1, as this is a constraint used in c
 
     > sum((wine.pca$loadings[,1])^2)
       [1] 1
+
+To calculate the values of the first principal component, we can define our own function:
+
+::
+
+    > calcwinepc1 <- function(variables,loadings)
+      {
+         # find the number of samples in the data set
+         numsamples <- nrow(variables)
+         # make a vector to store the first component
+         pc1 <- numeric(numsamples)
+         # find the number of variables 
+         numvariables <- length(variables)
+         # calculate the value of the first component for each sample
+         for (i in 1:numsamples)
+         {
+            valuei <- 0
+            for (j in 1:numvariables)
+            {
+               valueij <- variables[i,j]
+               loadingj <- loadings[j]
+               valuei <- valuei + (valueij * loadingj)
+            } 
+            pc1[i] <- valuei
+         }
+         return(pc1)
+      }
+
+We can then use the function to calculate the values of the first principal component for our
+wine data:
+
+::
+
+    > calcwinepc1(standardisedconcentrations, wine.pca$loadings[,1])
+      [1] -3.30742097 -2.20324981 -2.50966069 -3.74649719 -1.00607049 -3.04167373 -2.44220051 -2.05364379
+      [9] -2.50381135 -2.74588238 -3.46994837 -1.74981688 -2.10751729 -3.44842921 -4.30065228 -2.29870383
+      [17] -2.16584568 -1.89362947 -3.53202167 -2.07865856 -3.11561376 -1.08351361 -2.52809263 -1.64036108
+      [25] -1.75662066 -0.98729406 -1.77028387 -1.23194878 -2.18225047 -2.24976267 -2.49318704 -2.66987964
+      [33] -1.62399801 -1.89733870 -1.40642118 -1.89847087 -1.38096669 -1.11905070 -1.49796891 -2.52268490
+      [41] -2.58081526 -0.66660159 -3.06216898 -0.46090897 -2.09544094 -1.13297020 -2.71893118 -2.81340300
+      [49] -2.00419725 -2.69987528 -3.20587409 -2.85091773 -3.49574328 -2.21853316 -2.14094846 -2.46238340
+      ...       
+
+In fact, the values of the first principal component are stored in the variable wine.pca$scores[,1]
+that was returned by the "princomp()" function, so we can compare those values to the ones that we
+calculated, and they should agree:
+
+::
+
+    > wine.pca$scores[,1]
+      [1] -3.31675081 -2.20946492 -2.51674015 -3.75706561 -1.00890849 -3.05025392 -2.44908967 -2.05943687
+      [9] -2.51087430 -2.75362819 -3.47973668 -1.75475290 -2.11346234 -3.45815682 -4.31278391 -2.30518820
+      [17] -2.17195527 -1.89897118 -3.54198508 -2.08452220 -3.12440254 -1.08657007 -2.53522408 -1.64498834
+      [25] -1.76157587 -0.99007910 -1.77527763 -1.23542396 -2.18840633 -2.25610898 -2.50022003 -2.67741105
+      [33] -1.62857912 -1.90269086 -1.41038853 -1.90382623 -1.38486223 -1.12220741 -1.50219450 -2.52980109
+      [41] -2.58809543 -0.66848199 -3.07080699 -0.46220914 -2.10135193 -1.13616618 -2.72660096 -2.82133927
+      [49] -2.00985085 -2.70749130 -3.21491747 -2.85895983 -3.50560436 -2.22479138 -2.14698782 -2.46932948
+
+We get agreement to about 1 decimal place, the difference must be due to rounding error. xxx
 
 The first principal component has highest (in absolute value) loadings for V8 (-0.423), V7 (-0.395), V13 (-0.376),
 V10 (-0.313), V12 (-0.297), V14 (-0.287), V9 (0.299), V3 (0.245), and V5 (0.239). The loadings for V8, V7, V13,
@@ -843,8 +905,9 @@ Similarly, we can obtain the loadings for the second principal component by typi
       -0.039301722 -0.529995672  0.279235148  0.164496193 -0.364902832 
 
 This means that the second principal component is a linear combination of the variables:
--0.484*V2 - 0.225*V3 - 0.316*V4 + 0.011*V5 - 0.300*V6 - 0.065*V7 + 0.003*V8 - 0.029*V9
-- 0.039*V10 - 0.530*V11 + 0.279*V12 + 0.164*V13 - 0.365*V14.
+-0.484*Z2 - 0.225*Z3 - 0.316*Z4 + 0.011*Z5 - 0.300*Z6 - 0.065*Z7 + 0.003*Z8 - 0.029*Z9
+- 0.039*Z10 - 0.530*Z11 + 0.279*Z12 + 0.164*Z13 - 0.365*Z14, where Z1, Z2, Z3...Z14
+are the standardised versions of variables V2, V3, ... V14 that each have mean 0 and variance 1.
 
 Note that the square of the loadings sum to 1, as above:
 
@@ -868,8 +931,9 @@ The values of the principal components are stored in a named element "scores" of
 contains the first principal component, the second column the second component, and so on.
 
 Thus, in our example, "wine.pca$scores[,1]" contains the first principal component, and 
-"wine.pca$scores[,2]" contains the second principal component. We can therefore make a scatterplot
-of the first two principal components, and label the data points with the cultivar that the wine
+"wine.pca$scores[,2]" contains the second principal component. 
+
+We can make a scatterplot of the first two principal components, and label the data points with the cultivar that the wine
 samples come from, by typing:
 
 ::
@@ -996,14 +1060,23 @@ To get the values of the loadings of the discriminant functions based on the sta
       standardisedconcentrations$V12 -0.20517529 -0.335974619
       standardisedconcentrations$V13 -0.81875175  0.080084913
       standardisedconcentrations$V14 -0.79840001  0.942311575
-      
+
 This means that the first discriminant function is a linear combination of the variables:
--0.289*V2 - 0.203*V3 - 0.067*V4 + 0.490*V5 - 0.031*V6 + 0.385*V7 - 1.683*V8
-- 0.197*V9 + 0.067*V10 + 0.853*V11 - 0.205*V12 - 0.205*V12 - 0.819*V13 - 0.798*V14.
+-0.289*Z2 - 0.203*Z3 - 0.067*Z4 + 0.490*Z5 - 0.031*Z6 + 0.385*Z7 - 1.683*Z8
+- 0.197*Z9 + 0.067*Z10 + 0.853*Z11 - 0.205*Z12 - 0.205*Z12 - 0.819*Z13 - 0.798*Z14,
+where Z2, Z3,...Z14 are group-standardised versions of V2,V3...V14 (standardised so that
+the within-group variance is 1 for each variable).
+xxx are the loadings in R given for group-standardised versions??? get different loadings in R and SPSS.
+
+xxx check if I can get out the values using these loadings.
 
 Similarly the second disriminant function is the linear combination:
-0.724*V2 + 0.331*V3 + 0.648*V4 - 0.516*V5 - 0.005*V6 - 0.041*V7 - 0.402*V8
-- 0.193*V9 - 0.180*V10 + 0.542*V11 - 0.336*V12 + 0.080*V13 + 0.942*V14.
+0.724*Z2 + 0.331*Z3 + 0.648*Z4 - 0.516*Z5 - 0.005*Z6 - 0.041*Z7 - 0.402*Z8
+- 0.193*Z9 - 0.180*Z10 + 0.542*Z11 - 0.336*Z12 + 0.080*Z13 + 0.942*Z14,
+where Z2, Z3, Z14 are group-standardised versions of V2,V3...V14.
+
+xxx Interpret the discriminant function, and explain why the loadings are not surprising given Table 6 and the 
+covariances given in part (a)(ii). 
 
 Separation Achieved by the Discriminant Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1032,20 +1105,19 @@ variance to the within-groups variance:
 ::
 
     > calcSeparations(wine.lda.values$x,wine[1])
+      [1] "variable LD1 Vw= 1 Vb= 9.06767320353267 separation= 9.06767320353267"
+      [1] "variable LD2 Vw= 1 Vb= 4.14253527714928 separation= 4.14253527714928"
 
-    >
+Thus, the separation achieved by the first (best) discriminant function is 9.07, and the separation
+achieved by the second (second best) discriminant function is 4.14.
 
-
-
+We found above that the largest separation achieved for any of the individual variables (individual chemical concentrations)
+was 2.67 for V8, which is quite a lot less than 9.07, the separation achieved by the first discriminant function. Therefore,
+the effect of using more than one variable to calculate the discriminant function is that we can find a discriminant function
+that achieves a far greater separation between groups than achieved by any one variable alone.
 
 xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations", but
 this doesn't seem to be the square root of separation
-
-xxx
-xxx % Write down the separation achieved by the ﬁrst discriminant function. 
-xxx % Compare the separation achieved by the ﬁrst discriminant function with the largest separation for any individual variable from part (a)(i). 
-xxx % Hence comment brieﬂy on the e?ect of using more than one variable to calculate the discriminant function.
-
 
 Links and Further Reading
 -------------------------
