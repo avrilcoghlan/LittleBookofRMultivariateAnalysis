@@ -4,7 +4,8 @@ Using R for Multivariate Analysis
 Multivariate Analysis
 ---------------------
 
-This booklet itells you how to use the R statistical software to carry out some simple multivariate analyses.
+This booklet itells you how to use the R statistical software to carry out some simple multivariate analyses,
+with a focus on principal components analysis (PCA) and linear discriminant analysis (LDA).
 
 This booklet assumes that the reader has some basic knowledge of multivariate analyses, and
 the principal focus of the booklet is not to explain multivariate analyses, but rather 
@@ -184,7 +185,9 @@ Another type of plot that is useful is a "profile plot", which shows the variati
 variables, by plotting the value of each of the variables for each of the samples. 
 
 The function "makeProfilePlot()" below can be used to make a profile plot. This function requires
-the "RColorBrewer" library:
+the "RColorBrewer" library. To use this function, we first need to install the "RColorBrewer" R package 
+(for instructions on how to install an R package, see `How to install an R package 
+<./installr.html#how-to-install-an-r-package>`_).
 
 ::
 
@@ -278,7 +281,10 @@ Similarly, to get the standard deviations of the 13 chemical concentrations, we 
 We can see here that it would make sense to standardise in order to compare the variables because the variables
 have very different standard deviations - the standard deviation of V14 is 314.9074743, while the standard deviation
 of V9 is just 0.1244533. Thus, in order to compare the variables, we need to standardise each variable so that
-it has a sample variance of 1 and sample mean of 0. 
+it has a sample variance of 1 and sample mean of 0. We will explain below how to standardise the variables.
+
+Means and Variances Per Group
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 It is often interesting to calculate the means and standard deviations for just the samples
 from a particular group, for example, for the wine samples from each cultivar. The cultivar
@@ -319,13 +325,15 @@ prints out the mean and standard deviation of the variables for each group in yo
          # find out how many variables we have
          numvariables <- length(variables)   
          # find out how many values the group variable can take
-         groupvariable2 <- as.factor(groupvariable$V1)
+         groupvariable2 <- as.factor(groupvariable[[1]])
          levels <- levels(groupvariable2)
          numlevels <- length(levels)
          for (i in 1:numlevels)
          {
             leveli <- levels[i]
             levelidata <- variables[groupvariable==leveli,]
+            groupsize <- nrow(levelidata)
+            print(paste("Group",leveli,"Group size:",groupsize))
             print(paste("Group",leveli,"Means:"))
             print(mean(levelidata))
             print(paste("Group",leveli,"Standard Deviations:"))
@@ -341,6 +349,7 @@ for each of the 13 chemical concentrations, for each of the three different wine
 ::
 
     > printMeanAndSdByGroup(wine[2:14],wine[1])
+      [1] "Group 1 Group size: 59"
       [1] "Group 1 Means:"
          V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
       13.744746    2.010678    2.455593   17.037288  106.338983    2.840169    2.982373    0.290000    1.899322    5.528305 
@@ -351,6 +360,7 @@ for each of the 13 chemical concentrations, for each of the three different wine
       0.46212536   0.68854886   0.22716598   2.54632245  10.49894932   0.33896135   0.39749361   0.07004924   0.41210923 
          V11          V12          V13          V14 
       1.23857281   0.11648264   0.35707658 221.52076659 
+      [1] "Group 2 Group size: 71"
       [1] "Group 2 Means:"
          V2         V3         V4         V5         V6         V7         V8         V9        V10        V11        V12 
       12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845   0.363662   1.630282   3.086620   1.056282 
@@ -361,6 +371,7 @@ for each of the 13 chemical concentrations, for each of the three different wine
       0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008   0.1239613   0.6020678   0.9249293 
          V12         V13         V14 
       0.2029368   0.4965735 157.2112204 
+      [1] "Group 3 Group size: 48"
       [1] "Group 3 Means:"
          V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
       13.1537500   3.3337500   2.4370833  21.4166667  99.3125000   1.6787500   0.7814583   0.4475000   1.1535417   7.3962500 
@@ -371,6 +382,164 @@ for each of the 13 chemical concentrations, for each of the three different wine
       0.5302413   1.0879057   0.1846902   2.2581609  10.8904726   0.3569709   0.2935041   0.1241396   0.4088359   2.3109421 
          V12         V13         V14 
       0.1144411   0.2721114 115.0970432 
+
+The function "printMeanAndSdByGroup()" also prints out the number of samples in each group. In this case,
+we see that there are 59 samples of cultivar 1, 71 of cultivar 2, and 48 of cultivar 3.
+
+Between-groups Variance and Within-groups Variance for a Variable
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If we want to calculate the within-groups variance for a particular variable (for example, for a particular
+chemical's concentration), we can use the function "calcWithinGroupsVariance()" below:
+
+::
+
+    > calcWithinGroupsVariance <- function(variable,groupvariable) 
+      {
+         # find out how many values the group variable can take
+         groupvariable2 <- as.factor(groupvariable[[1]])
+         levels <- levels(groupvariable2)
+         numlevels <- length(levels)
+         # get the mean and standard deviation for each group:
+         numtotal <- 0
+         denomtotal <- 0
+         for (i in 1:numlevels)
+         {
+            leveli <- levels[i]
+            levelidata <- variable[groupvariable==leveli,]
+            levelilength <- length(levelidata)
+            # get the mean and standard deviation for group i:
+            meani <- mean(levelidata)
+            sdi <- sd(levelidata)
+            numi <- (levelilength - 1)*(sdi * sdi)
+            denomi <- levelilength
+            numtotal <- numtotal + numi
+            denomtotal <- denomtotal + denomi 
+         } 
+         # calculate the within-groups variance
+         Vw <- numtotal / (denomtotal - numlevels) 
+         return(Vw)
+      }
+
+xxx need to check that this formula is correct.
+
+You will need to copy and paste this function into R before you can use it.
+For example, to calculate the within-groups variance of the variable V2 (the concentration of the first chemical),
+we type:
+
+::
+
+    > calcWithinGroupsVariance(wine[2],wine[1]) 
+      [1] 0.2620525
+
+Thus, the within-groups variance for V2 is 0.2620525. 
+
+We can calculate the between-groups variance for a particular variable (eg. V2) using the function
+"calcBetweenGroupsVariance()" below:
+
+::
+
+    > calcBetweenGroupsVariance <- function(variable,groupvariable) 
+      {
+         # find out how many values the group variable can take
+         groupvariable2 <- as.factor(groupvariable[[1]])
+         levels <- levels(groupvariable2)
+         numlevels <- length(levels)
+         # calculate the overall grand mean: 
+         grandmean <- mean(variable) # xxx is this formula ok?
+         # get the mean and standard deviation for each group:
+         numtotal <- 0
+         denomtotal <- 0
+         for (i in 1:numlevels)
+         {
+            leveli <- levels[i]
+            levelidata <- variable[groupvariable==leveli,]
+            levelilength <- length(levelidata)
+            # get the mean and standard deviation for group i:
+            meani <- mean(levelidata)
+            sdi <- sd(levelidata)
+            numi <- levelilength * ((meani - grandmean)^2)
+            denomi <- levelilength
+            numtotal <- numtotal + numi
+            denomtotal <- denomtotal + denomi 
+         } 
+         # calculate the between-groups variance
+         Vb <- numtotal / (denomtotal - numlevels) 
+         Vb <- Vb[[1]]
+         return(Vb)
+      }
+
+xxx need to check the formula
+
+Once you have copied and pasted this function into R, you can use it to calculate the between-groups
+variance for a variable such as V2:
+
+::
+
+    > calcBetweenGroupsVariance (wine[2],wine[1])
+      [1] 0.404542
+
+Thus, the between-groups variance of V2 is 0.404542.
+
+We can calculate the "separation" achieved by a variable as its between-groups variance devided by its
+within-groups variance. Thus, the separation achieved by V2 is calculated as:
+
+::
+
+    > 0.404542/0.2620525
+      [1] 1.543744
+
+If you want to calculate the separations achieved by all of the variables in a multivariate data set,
+you can use the function "calcSeparations()" below:
+
+::
+
+    > calcSeparations <- function(variables,groupvariable)
+      {
+         # find out how many variables we have
+         numvariables <- length(variables)
+         # find the variable names
+         variablenames <- colnames(variables)
+         # calculate the separation for each variable
+         for (i in 1:numvariables)
+         {
+            variablei <- variables[i]
+            variablename <- variablenames[i]
+            Vw <- calcWithinGroupsVariance(variablei, groupvariable)
+            Vb <- calcBetweenGroupsVariance(variablei, groupvariable)
+            sep <- Vb/Vw
+            print(paste("variable",variablename,"separation=",sep))
+         }
+      }
+
+xxx need to check this is correct
+
+For example, to calculate the separations for each of the 13 chemical concentrations, we type:
+
+::
+
+    > calcSeparations(wine[2:14],wine[1])
+      [1] "variable V2 separation= 1.54374427706057"
+      [1] "variable V3 separation= 0.422210571007813"
+      [1] "variable V4 separation= 0.152147442285612"
+      [1] "variable V5 separation= 0.408818713226392"
+      [1] "variable V6 separation= 0.142052392435999"
+      [1] "variable V7 separation= 1.07123439566134"
+      [1] "variable V8 separation= 2.67343854493199"
+      [1] "variable V9 separation= 0.315147624536753"
+      [1] "variable V10 separation= 0.345958664802601"
+      [1] "variable V11 separation= 1.37901735361146"
+      [1] "variable V12 separation= 1.157906233032"
+      [1] "variable V13 separation= 2.17111223518731"
+      [1] "variable V14 separation= 2.37623284459632"
+
+xxx should probably say something about the interpretation of these values.
+
+Between-groups Covariance and Within-groups Covariance for Two Variables
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+xxx should also include functions for calculating between-groups covariance and within-groups covariance.
+Also see Q3 part (a)(ii) of assignment 3 for interpretation of this.
 
 Calculating Correlations for Multivariate Data
 ----------------------------------------------
@@ -471,8 +640,21 @@ Standardising Variables
 -----------------------
 
 If you want to compare different variables that have different units, are very different variances,
-it is a good idea to first standardise the variables, so that each variable has a mean of 0 and
-a standard deviation of 1. 
+it is a good idea to first standardise the variables. 
+
+For example, we found above that the concentrations of the 13 chemicals in the wine samples show a wide range of 
+standard deviations, from 0.1244533 for V9 (variance 0.01548862) to 314.9074743 for V14 (variance 99166.72).
+This is a range of approximately 6,402,554-fold in the variances. 
+
+As a result, it is not a good idea to use the unstandardised chemical concentrations as the input for a
+principal component analysis (PCA, see below) of the
+wine samples, as if you did that, the first principal component would be dominated by the variables
+which show the largest variances, such as V14.
+
+Thus, it would be a better idea to first standardise the variables so that they all have variance 1 and mean 0, 
+and to then carry out the principal component analysis on the standardised data. This would allow us to 
+find the principal components that provide the best low-dimensional representation of the variation in the
+original data, without being overly biased by those variables that show the most variance in the original data.
 
 You can standardise variables in R using the "scale()" function. 
 
@@ -504,6 +686,12 @@ essentially equal to 0, and the standard deviations of the standardised variable
 
 Principal Component Analysis
 ----------------------------
+
+The purpose of principal component analysis is to find the best low-dimensional representation of the variation in a
+multivariate data set. For example, in the case of the wine data set, we have 13 chemical concentrations describing
+wine samples from three different cultivars. We can carry out a principal component analysis to investigate 
+whether wine samples from different cultivars can be distinguished by a smaller number of new variables (principal
+components), where each of these new variables is a linear combination of all or some of the 13 chemical concentrations.
 
 To carry out a principal component analysis (PCA) on a multivariate data set, the first step is often to standardise
 the variables under study using the "scale()" function (see above). This is necessary if the input variables
@@ -627,6 +815,17 @@ analysis of the 13 chemical concentrations in wine samples, we type:
              V10          V11          V12          V13          V14 
       -0.313429488  0.088616705 -0.296714564 -0.376167411 -0.286752227
 
+This means that the first principal component is a linear combination of the variables:
+-0.144*V2 + 0.245*V3 + 0.002*V4 + 0.239*V5 - 0.142*V6 - 0.395*V7 - 0.423*V8 + 0.299*V9
+-0.313*V10 + 0.089*V11 - 0.297*V12 - 0.376*V13 - 0.287*V14.
+
+Note that the square of the loadings sum to 1, as this is a constraint used in calculating the loadings:
+
+::
+
+    > sum((wine.pca$loadings[,1])^2)
+      [1] 1
+
 The first principal component has highest (in absolute value) loadings for V8 (-0.423), V7 (-0.395), V13 (-0.376),
 V10 (-0.313), V12 (-0.297), V14 (-0.287), V9 (0.299), V3 (0.245), and V5 (0.239). The loadings for V8, V7, V13,
 V10, V12 and V14 are negative, while those for V9, V3, and V5 are positive. Therefore, an interpretation of the
@@ -642,7 +841,18 @@ Similarly, we can obtain the loadings for the second principal component by typi
       -0.483651548 -0.224930935 -0.316068814  0.010590502 -0.299634003 -0.065039512  0.003359812 -0.028779488 
              V10          V11          V12          V13          V14 
       -0.039301722 -0.529995672  0.279235148  0.164496193 -0.364902832 
-      
+
+This means that the second principal component is a linear combination of the variables:
+-0.484*V2 - 0.225*V3 - 0.316*V4 + 0.011*V5 - 0.300*V6 - 0.065*V7 + 0.003*V8 - 0.029*V9
+- 0.039*V10 - 0.530*V11 + 0.279*V12 + 0.164*V13 - 0.365*V14.
+
+Note that the square of the loadings sum to 1, as above:
+
+::
+
+    > sum((wine.pca$loadings[,2])^2)
+      [1] 1
+
 The second principal component has highest loadings for V11 (-0.530), V2 (-0.484), V14 (-0.365), V4 (-0.316), 
 V6 (-0.300), V12 (0.279), and V3 (-0.225). The loadings for V11, V2, V14, V4, V6 and V3 are negative, while
 the loading for V12 is positive. Therefore, an interpretation of the second principal component is that
@@ -714,19 +924,127 @@ are very low compared to the mean values of V9 (0.688), V3 (0.893) and V5 (0.575
 Therefore, it does make sense that principal component 1 is a contrast between the concentrations of V8, V7, V13, V10, V12, and V14,
 and the concentrations of V9, V3 and V5; and that principal component 1 can separate cultivar 1 from cultivar 3.
 
+Above, we intepreted the second principal component as a contrast between the concentrations of V11, 
+V2, V14, V4, V6 and V3, and the concentration of V12.
+In the light of the mean values of these variables in the different cultivars, does 
+it make sense that the second principal component can separate cultivar 2 from cultivars 1 and 3?
+In cultivar 1, the mean values of V11 (0.203), V2 (0.917), V14 (1.171), V4 (0.325), V6 (0.462) and V3 (-0.292)
+are not very different from the mean value of V12 (0.458). 
+In cultivar 3, the mean values of V11 (1.009), V2 (0.189), V14 (-0.372), V4 (0.257), V6 (-0.030) and V3 (0.893)
+are also not very different from the mean value of V12 (-1.202). 
+In contrast, in cultivar 2, the mean values of V11 (-0.850), V2 (-0.889), V14 (-0.722), V4 (-0.444), V6 (-0.364) and V3 (-0.361)
+are much less than the mean value of V12 (0.432). 
+Therefore, it makes sense that principal component is a contrast between the concentrations of V11, 
+V2, V14, V4, V6 and V3, and the concentration of V12; and that principal component 2 can separate cultivar 2 from cultivars 1 and 3.
+
+Linear Discriminant Analysis
+----------------------------
+
+The purpose of principal component analysis is to find the best low-dimensional representation of the variation in a
+multivariate data set. For example, in the wine data set, we have 13 chemical concentrations describing wine samples
+from three different cultivars. By carrying out a principal component analysis, we found that the three cultivars can
+be distinguished based on the first two principal components, where each of the principal components is a particular linear
+combination of the 13 chemical concentrations.
+
+The purpose of linear discriminant analysis (LDA) is to find the linear combinations of the original variables (the 13
+chemical concentrations here) that gives the best possible separation between the groups (wine cultivars here) in our
+data set. 
+
+You can carry out a linear discriminant analysis using the "lda()" function from the R "MASS" package.
+To use this function, we first need to install the "MASS" R package 
+(for instructions on how to install an R package, see `How to install an R package 
+<./installr.html#how-to-install-an-r-package>`_).
+
+For example, to carry out a linear discriminant analysis using the 13 chemical concentrations in the wine samples, we type:
+
+::
+
+    > library("MASS")                                                # load the MASS package
+    > standardisedconcentrations <- as.data.frame(scale(wine[2:14])) # standardise the variables
+    > wine.lda <- lda(wine$V1 ~ standardisedconcentrations$V2 + standardisedconcentrations$V3 + standardisedconcentrations$V4 +
+                                standardisedconcentrations$V5 + standardisedconcentrations$V6 + standardisedconcentrations$V7 + 
+                                standardisedconcentrations$V8 + standardisedconcentrations$V9 + standardisedconcentrations$V10 +
+                                standardisedconcentrations$V11 + standardisedconcentrations$V12 + standardisedconcentrations$V13 +
+                                standardisedconcentrations$V14, prior=c(1/3,1/3,1/3))
+                    
+As for the PCA, it is a good idea to standardise your variables before carrying out a LDA, if the
+original variables have very different variances (which is the case of the 13 concentration variables, see above), so
+we use "scale()" to standardise variables before running "lda()" on the standardised variables.
+The "prior=c(1/3,1/3,1/3)" argument tells "lda()" that we want to assume that it is equally likely that a wine sample
+belongs to each of the groups (cultivars). 
+
+Loadings for the Discriminant Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To get the values of the loadings of the discriminant functions based on the standardised data, we type:
+
+::
+
+    > wine.lda
+      Coefficients of linear discriminants:                                      
+                                          LD1          LD2
+      standardisedconcentrations$V2  -0.28930985  0.724190975
+      standardisedconcentrations$V3   0.20253117  0.330831040
+      standardisedconcentrations$V4  -0.06681410  0.648051143
+      standardisedconcentrations$V5   0.49017234 -0.515701775
+      standardisedconcentrations$V6  -0.03120840 -0.004953265
+      standardisedconcentrations$V7   0.38518458 -0.040744671
+      standardisedconcentrations$V8  -1.68312608 -0.402314982
+      standardisedconcentrations$V9  -0.19671169 -0.192768856
+      standardisedconcentrations$V10  0.06727363 -0.179604486
+      standardisedconcentrations$V11  0.85323534  0.542363156
+      standardisedconcentrations$V12 -0.20517529 -0.335974619
+      standardisedconcentrations$V13 -0.81875175  0.080084913
+      standardisedconcentrations$V14 -0.79840001  0.942311575
+      
+This means that the first discriminant function is a linear combination of the variables:
+-0.289*V2 - 0.203*V3 - 0.067*V4 + 0.490*V5 - 0.031*V6 + 0.385*V7 - 1.683*V8
+- 0.197*V9 + 0.067*V10 + 0.853*V11 - 0.205*V12 - 0.205*V12 - 0.819*V13 - 0.798*V14.
+
+Similarly the second disriminant function is the linear combination:
+0.724*V2 + 0.331*V3 + 0.648*V4 - 0.516*V5 - 0.005*V6 - 0.041*V7 - 0.402*V8
+- 0.193*V9 - 0.180*V10 + 0.542*V11 - 0.336*V12 + 0.080*V13 + 0.942*V14.
+
+Separation Achieved by the Discriminant Functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To calculate the separation achieved by each discriminant function, we first need to calculate the
+value of each discriminant function, by substituting the variables' values into the linear combination for
+the discriminant function (eg. -0.289*V2 - 0.203*V3 - 0.067*V4 + 0.490*V5 - 0.031*V6 + 0.385*V7 - 1.683*V8
+- 0.197*V9 + 0.067*V10 + 0.853*V11 - 0.205*V12 - 0.205*V12 - 0.819*V13 - 0.798*V14 for the first
+discriminant function).
+
+We can do this using the "predict()" function in R. For example,
+to calculate the value of the discriminant functions for the wine data, we type:
+
+::
+
+    > wine.lda.values <- predict(wine.lda, standardisedconcentrations) 
+
+The returned variable has a named element "x" which is a matrix containing the linear discriminant functions:
+the first column of x contains the first discriminant function, the second column of x contains the second
+discriminant function, and so on (if there are more discriminant functions).
+    
+We can therefore calculate the separations achieved by the two linear discriminant functions for the wine data by using the
+"calcSeparations()" function (see above), which calculates the separation as the ratio of the between-groups
+variance to the within-groups variance:
+
+::
+
+    > calcSeparations(wine.lda.values$x,wine[1])
+
+    >
 
 
+
+
+xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations", but
+this doesn't seem to be the square root of separation
 
 xxx
-
-
-
-
-
-
-
-% xxx Do your answers to part (a)(iv) make sense in light of your interpretation of the ﬁrst two principal components (based on 
-% standardized data) in part (a)(iii)? Brieﬂy explain why or why not.
+xxx % Write down the separation achieved by the ﬁrst discriminant function. 
+xxx % Compare the separation achieved by the ﬁrst discriminant function with the largest separation for any individual variable from part (a)(i). 
+xxx % Hence comment brieﬂy on the e?ect of using more than one variable to calculate the discriminant function.
 
 
 Links and Further Reading
