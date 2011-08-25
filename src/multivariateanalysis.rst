@@ -1007,6 +1007,12 @@ The purpose of linear discriminant analysis (LDA) is to find the linear combinat
 chemical concentrations here) that gives the best possible separation between the groups (wine cultivars here) in our
 data set. 
 
+If we want to separate the wines by cultivar, the wines come from three different cultivars, so the number of groups (G) is 3, 
+and the number of variables is 13 (13 chemicals' concentrations; p = 13).  The maximum number of useful discriminant
+functions that can separate the wines by cultivar is the minimum of G-1 and p, and so in this case it is the minimum of 2 and 13, 
+which is 2. Thus, we can find at most 2 useful discriminant functions to separate the wines by cultivar, using the 
+13 chemical concentration variables.
+
 You can carry out a linear discriminant analysis using the "lda()" function from the R "MASS" package.
 To use this function, we first need to install the "MASS" R package 
 (for instructions on how to install an R package, see `How to install an R package 
@@ -1114,6 +1120,19 @@ variance to the within-groups variance:
 Thus, the separation achieved by the first (best) discriminant function is 9.07, and the separation
 achieved by the second (second best) discriminant function is 4.14.
 
+Therefore, the total separation is the sum of these, which is (9.06767320353267+4.14253527714928=13.21021) 
+13.21, rounded to two decimal places. Therefore, the percentage separation achieved by the
+first discriminant function is (9.07*100/13.21=) 68.64%, and the percentage separation achieved by the 
+second discriminant function is (4.14*100/13.21=) 31.36%.
+   
+xxx The "proportion of trace" that is printed is the proportion of between-class variance that is explained by successive
+discriminant functions. xxx get 72.98% and 27.02% - does not agree with the percentage separation, which I get.
+
+Therefore, the first discriminant function does achieve a good separation between the three groups (three cultivars), but the second
+discriminant function does improve the separation of the groups by quite a large amount, so is it worth using the 
+second discriminant function as well. Therefore, to achieve a good separation of the groups (cultivars), 
+it is necessary to use both of the first two discriminant functions.
+
 We found above that the largest separation achieved for any of the individual variables (individual chemical concentrations)
 was 2.67 for V8, which is quite a lot less than 9.07, the separation achieved by the first discriminant function. Therefore,
 the effect of using more than one variable to calculate the discriminant function is that we can find a discriminant function
@@ -1121,6 +1140,8 @@ that achieves a far greater separation between groups than achieved by any one v
 
 xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations", but
 this doesn't seem to be the square root of separation
+
+% xxx Write down the separation and percentage separation achieved by each discriminant function. 
 
 A Stacked Histogram of the LDA Values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1136,6 +1157,45 @@ function's values for wine samples of the three different wine cultivars, we typ
     > ldahist(data = wine.lda.values$x[,1], g=wine$V1)
 
 |image8|
+
+We can see from the histogram that cultivars 1 and 3 are well separated by the first
+discriminant function, since the values for the first cultivar are between -6 and -1,
+while the values for cultivar 3 are between 1 and 6, and so there is no overlap in values.
+
+However, the separation achieved by the linear discriminant function on the training
+set may be an overestimate. To get a more accurate idea of how well the first discriminant function 
+separates the groups, we would need to see a stacked histogram of the values for the three
+cultivars using some unseen "test set", that is, using
+a set of data that was not used to calculate the linear discriminant function.
+
+We see that the first discriminant function separates cultivars 1 and 3 very well, but
+does not separate cultivars 1 and 2, or cultivars 2 and 3, so well.
+
+We therefore investigate whether the second discriminant function separates those cultivars,
+by making a stacked histogram of the second discriminant function's values:
+
+::
+
+    > ldahist(data = wine.lda.values$x[,2], g=wine$V1)
+
+|image9|
+
+We see that the second discriminant function separates cultivars 1 and 2 quite well, although
+there is a little overlap in their values. Furthermore, the second discriminant function also
+separates cultivars 2 and 3 quite well, although again there is a little overlap in their values so 
+it is not perfect.
+
+Thus, we see that two discriminant functions are necessary to separate the cultivars, as was
+discussed above (see the discussion of percentage separation above).
+
+Scatterplots of the Principal Components
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+% xxx Obtain a scatterplot of the ﬁrst two discriminant functions, with di?erent plotting symbols for the di?erent countries, and include this 
+% plot in your answer. Are the three countries well separated in this scatterplot? In addition, brieﬂy discuss how well the countries are 
+% separated by the ﬁrst discriminant function alone and the second discriminant function alone. 
+
 
 Links and Further Reading
 -------------------------
@@ -1195,3 +1255,6 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
             :width: 400
 .. |image8| image:: ../_static/image8.png
             :width: 400
+.. |image9| image:: ../_static/image9.png
+            :width: 400
+
