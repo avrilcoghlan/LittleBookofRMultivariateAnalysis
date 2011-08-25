@@ -699,7 +699,7 @@ the variables under study using the "scale()" function (see above). This is nece
 have very different variances, which is true in this case as the concentrations of the 13 chemicals have
 very different variances (see above).
 
-Once you have standardised your variables, you can carry out a principal component analysis using the "princomp()"
+Once you have standardised your variables, you can carry out a principal component analysis using the "prcomp()"
 function in R.
 
 For example, to standardise the concentrations of the 13 chemicals in the wine samples, and carry out a 
@@ -708,42 +708,33 @@ principal components analysis on the standardised concentrations, we type:
 ::
 
     > standardisedconcentrations <- as.data.frame(scale(wine[2:14])) # standardise the variables
-    > wine.pca <- princomp(standardisedconcentrations,cor="TRUE")    # do a PCA
-
-Note that the "cor=TRUE" argument in "princomp()" ensures that in the results reported, the 
-sum of the variances of the principal components is equal to the number of standardised variables (13 here).
+    > wine.pca <- prcomp(standardisedconcentrations)                 # do a PCA
 
 You can get a summary of the principal component analysis results using the "summary()" function on the
-output of "princomp()":
+output of "prcomp()":
 
 ::
 
     > summary(wine.pca)
       Importance of components:
-                               Comp.1    Comp.2    Comp.3    Comp.4     Comp.5
-      Standard deviation     2.1692972 1.5801816 1.2025273 0.9586313 0.92370351
-      Proportion of Variance 0.3619885 0.1920749 0.1112363 0.0706903 0.06563294
-      Cumulative Proportion  0.3619885 0.5540634 0.6652997 0.7359900 0.80162293
-                               Comp.6     Comp.7     Comp.8     Comp.9    Comp.10
-      Standard deviation     0.80103498 0.74231281 0.59033665 0.53747553 0.50090167
-      Proportion of Variance 0.04935823 0.04238679 0.02680749 0.02222153 0.01930019
-      Cumulative Proportion  0.85098116 0.89336795 0.92017544 0.94239698 0.96169717
-                               Comp.11    Comp.12     Comp.13
-      Standard deviation     0.47517222 0.41081655 0.321524394
-      Proportion of Variance 0.01736836 0.01298233 0.007952149
-      Cumulative Proportion  0.97906553 0.99204785 1.000000000
+                              PC1   PC2   PC3    PC4    PC5    PC6    PC7    PC8    PC9   PC10
+      Standard deviation     2.169 1.580 1.203 0.9586 0.9237 0.8010 0.7423 0.5903 0.5375 0.5009
+      Proportion of Variance 0.362 0.192 0.111 0.0707 0.0656 0.0494 0.0424 0.0268 0.0222 0.0193
+      Cumulative Proportion  0.362 0.554 0.665 0.7360 0.8016 0.8510 0.8934 0.9202 0.9424 0.9617
+                              PC11   PC12    PC13
+      Standard deviation     0.4752 0.4108 0.32152
+      Proportion of Variance 0.0174 0.0130 0.00795
+      Cumulative Proportion  0.9791 0.9920 1.00000
 
 This gives us the standard deviation of each component, and the proportion of variance explained by
 each component. The standard deviation of the components is stored in a named element called "sdev" of the output 
-variable made by "princomp":
+variable made by "prcomp":
 
 ::
 
     > wine.pca$sdev
-         Comp.1    Comp.2    Comp.3    Comp.4    Comp.5    Comp.6    Comp.7    Comp.8 
-      2.1692972 1.5801816 1.2025273 0.9586313 0.9237035 0.8010350 0.7423128 0.5903367 
-        Comp.9   Comp.10   Comp.11   Comp.12   Comp.13 
-      0.5374755 0.5009017 0.4751722 0.4108165 0.3215244 
+      [1] 2.1692972 1.5801816 1.2025273 0.9586313 0.9237035 0.8010350 0.7423128 0.5903367
+      [9] 0.5374755 0.5009017 0.4751722 0.4108165 0.3215244
 
 The total variance explained by the components is the sum of the variances of the components:
 
@@ -782,10 +773,8 @@ of the principal components:
 ::
 
     > (wine.pca$sdev)^2
-       Comp.1    Comp.2    Comp.3    Comp.4    Comp.5    Comp.6    Comp.7    Comp.8 
-     4.7058503 2.4969737 1.4460720 0.9189739 0.8532282 0.6416570 0.5510283 0.3484974 
-       Comp.9   Comp.10   Comp.11   Comp.12   Comp.13 
-     0.2888799 0.2509025 0.2257886 0.1687702 0.1033779 
+      [1] 4.7058503 2.4969737 1.4460720 0.9189739 0.8532282 0.6416570 0.5510283 0.3484974
+      [9] 0.2888799 0.2509025 0.2257886 0.1687702 0.1033779
 
 We see that the variance is above 1 for principal components 1, 2, and 3 (which have variances
 4.71, 2.50, and 1.45, respectively). Therefore, using Kaiser's criterion, we would retain the first
@@ -800,8 +789,8 @@ explain 80.2% of the variance (while the first four components explain just 73.6
 Loadings for the Principal Components
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The loadings for the principal components are stored in a named element "loadings" of the variable
-returned by "princomp()". This contains a matrix with the loadings of each principal component, where
+The loadings for the principal components are stored in a named element "rotation" of the variable
+returned by "prcomp()". This contains a matrix with the loadings of each principal component, where
 the first column in the matrix contains the loadings for the first principal component, the second
 column contains the loadings for the second principal component, and so on.
 
@@ -810,11 +799,13 @@ analysis of the 13 chemical concentrations in wine samples, we type:
 
 ::
 
-    > wine.pca$loadings[,1]
-             V2           V3           V4           V5           V6           V7           V8           V9 
-      -0.144329395  0.245187580  0.002051061  0.239320405 -0.141992042 -0.394660845 -0.422934297  0.298533103 
-             V10          V11          V12          V13          V14 
-      -0.313429488  0.088616705 -0.296714564 -0.376167411 -0.286752227
+    > wine.pca$rotation[,1]
+          V2           V3           V4           V5           V6           V7 
+      -0.144329395  0.245187580  0.002051061  0.239320405 -0.141992042 -0.394660845 
+          V8           V9          V10          V11          V12          V13 
+      -0.422934297  0.298533103 -0.313429488  0.088616705 -0.296714564 -0.376167411 
+         V14 
+      -0.286752227 
 
 This means that the first principal component is a linear combination of the variables:
 -0.144*Z2 + 0.245*Z3 + 0.002*Z4 + 0.239*Z5 - 0.142*Z6 - 0.395*Z7 - 0.423*Z8 + 0.299*Z9
@@ -826,16 +817,17 @@ Note that the square of the loadings sum to 1, as this is a constraint used in c
 
 ::
 
-    > sum((wine.pca$loadings[,1])^2)
+    > sum((wine.pca$rotation[,1])^2)
       [1] 1
 
 To calculate the values of the first principal component, we can define our own function:
 
 ::
 
-    > calcwinepc1 <- function(variables,loadings)
+    > calcpc1 <- function(variables,loadings)
       {
          # find the number of samples in the data set
+         as.data.frame(variables)
          numsamples <- nrow(variables)
          # make a vector to store the first component
          pc1 <- numeric(numsamples)
@@ -856,37 +848,36 @@ To calculate the values of the first principal component, we can define our own 
          return(pc1)
       }
 
-We can then use the function to calculate the values of the first principal component for our
+We can then use the function to calculate the values of the first principal component for each sample in our
 wine data:
 
 ::
 
-    > calcwinepc1(standardisedconcentrations, wine.pca$loadings[,1])
-      [1] -3.30742097 -2.20324981 -2.50966069 -3.74649719 -1.00607049 -3.04167373 -2.44220051 -2.05364379
-      [9] -2.50381135 -2.74588238 -3.46994837 -1.74981688 -2.10751729 -3.44842921 -4.30065228 -2.29870383
-      [17] -2.16584568 -1.89362947 -3.53202167 -2.07865856 -3.11561376 -1.08351361 -2.52809263 -1.64036108
-      [25] -1.75662066 -0.98729406 -1.77028387 -1.23194878 -2.18225047 -2.24976267 -2.49318704 -2.66987964
-      [33] -1.62399801 -1.89733870 -1.40642118 -1.89847087 -1.38096669 -1.11905070 -1.49796891 -2.52268490
-      [41] -2.58081526 -0.66660159 -3.06216898 -0.46090897 -2.09544094 -1.13297020 -2.71893118 -2.81340300
-      [49] -2.00419725 -2.69987528 -3.20587409 -2.85091773 -3.49574328 -2.21853316 -2.14094846 -2.46238340
-      ...       
+    > calcpc1(standardisedconcentrations, wine.pca$rotation[,1])
+      [1] -3.30742097 -2.20324981 -2.50966069 -3.74649719 -1.00607049 -3.04167373 -2.44220051
+      [8] -2.05364379 -2.50381135 -2.74588238 -3.46994837 -1.74981688 -2.10751729 -3.44842921
+      [15] -4.30065228 -2.29870383 -2.16584568 -1.89362947 -3.53202167 -2.07865856 -3.11561376
+      [22] -1.08351361 -2.52809263 -1.64036108 -1.75662066 -0.98729406 -1.77028387 -1.23194878
+      [29] -2.18225047 -2.24976267 -2.49318704 -2.66987964 -1.62399801 -1.89733870 -1.40642118
+      [36] -1.89847087 -1.38096669 -1.11905070 -1.49796891 -2.52268490 -2.58081526 -0.66660159
+      ...   
 
-In fact, the values of the first principal component are stored in the variable wine.pca$scores[,1]
-that was returned by the "princomp()" function, so we can compare those values to the ones that we
+In fact, the values of the first principal component are stored in the variable wine.pca$x[,1]
+that was returned by the "prcomp()" function, so we can compare those values to the ones that we
 calculated, and they should agree:
 
 ::
 
-    > wine.pca$scores[,1]
-      [1] -3.31675081 -2.20946492 -2.51674015 -3.75706561 -1.00890849 -3.05025392 -2.44908967 -2.05943687
-      [9] -2.51087430 -2.75362819 -3.47973668 -1.75475290 -2.11346234 -3.45815682 -4.31278391 -2.30518820
-      [17] -2.17195527 -1.89897118 -3.54198508 -2.08452220 -3.12440254 -1.08657007 -2.53522408 -1.64498834
-      [25] -1.76157587 -0.99007910 -1.77527763 -1.23542396 -2.18840633 -2.25610898 -2.50022003 -2.67741105
-      [33] -1.62857912 -1.90269086 -1.41038853 -1.90382623 -1.38486223 -1.12220741 -1.50219450 -2.52980109
-      [41] -2.58809543 -0.66848199 -3.07080699 -0.46220914 -2.10135193 -1.13616618 -2.72660096 -2.82133927
-      [49] -2.00985085 -2.70749130 -3.21491747 -2.85895983 -3.50560436 -2.22479138 -2.14698782 -2.46932948
-
-We get agreement to about 1 decimal place, the difference must be due to rounding error. xxx
+    > wine.pca$x[,1]
+      [1] -3.30742097 -2.20324981 -2.50966069 -3.74649719 -1.00607049 -3.04167373 -2.44220051
+      [8] -2.05364379 -2.50381135 -2.74588238 -3.46994837 -1.74981688 -2.10751729 -3.44842921
+      [15] -4.30065228 -2.29870383 -2.16584568 -1.89362947 -3.53202167 -2.07865856 -3.11561376
+      [22] -1.08351361 -2.52809263 -1.64036108 -1.75662066 -0.98729406 -1.77028387 -1.23194878
+      [29] -2.18225047 -2.24976267 -2.49318704 -2.66987964 -1.62399801 -1.89733870 -1.40642118
+      [36] -1.89847087 -1.38096669 -1.11905070 -1.49796891 -2.52268490 -2.58081526 -0.66660159
+      ...
+      
+We see that they do agree.
 
 The first principal component has highest (in absolute value) loadings for V8 (-0.423), V7 (-0.395), V13 (-0.376),
 V10 (-0.313), V12 (-0.297), V14 (-0.287), V9 (0.299), V3 (0.245), and V5 (0.239). The loadings for V8, V7, V13,
@@ -898,48 +889,50 @@ Similarly, we can obtain the loadings for the second principal component by typi
 
 ::
 
-    > wine.pca$loadings[,2]
-             V2           V3           V4           V5           V6           V7           V8           V9 
-      -0.483651548 -0.224930935 -0.316068814  0.010590502 -0.299634003 -0.065039512  0.003359812 -0.028779488 
-             V10          V11          V12          V13          V14 
-      -0.039301722 -0.529995672  0.279235148  0.164496193 -0.364902832 
+    > wine.pca$rotation[,2]
+          V2           V3           V4           V5           V6           V7 
+      0.483651548  0.224930935  0.316068814 -0.010590502  0.299634003  0.065039512 
+          V8           V9          V10          V11          V12          V13 
+      -0.003359812  0.028779488  0.039301722  0.529995672 -0.279235148 -0.164496193 
+         V14 
+      0.364902832 
 
 This means that the second principal component is a linear combination of the variables:
--0.484*Z2 - 0.225*Z3 - 0.316*Z4 + 0.011*Z5 - 0.300*Z6 - 0.065*Z7 + 0.003*Z8 - 0.029*Z9
-- 0.039*Z10 - 0.530*Z11 + 0.279*Z12 + 0.164*Z13 - 0.365*Z14, where Z1, Z2, Z3...Z14
+0.484*Z2 + 0.225*Z3 + 0.316*Z4 - 0.011*Z5 + 0.300*Z6 + 0.065*Z7 - 0.003*Z8 + 0.029*Z9
++ 0.039*Z10 + 0.530*Z11 - 0.279*Z12 - 0.164*Z13 + 0.365*Z14, where Z1, Z2, Z3...Z14
 are the standardised versions of variables V2, V3, ... V14 that each have mean 0 and variance 1.
 
 Note that the square of the loadings sum to 1, as above:
 
 ::
 
-    > sum((wine.pca$loadings[,2])^2)
+    > sum((wine.pca$rotation[,2])^2)
       [1] 1
 
-The second principal component has highest loadings for V11 (-0.530), V2 (-0.484), V14 (-0.365), V4 (-0.316), 
-V6 (-0.300), V12 (0.279), and V3 (-0.225). The loadings for V11, V2, V14, V4, V6 and V3 are negative, while
-the loading for V12 is positive. Therefore, an interpretation of the second principal component is that
+The second principal component has highest loadings for V11 (0.530), V2 (0.484), V14 (0.365), V4 (0.316), 
+V6 (0.300), V12 (-0.279), and V3 (0.225). The loadings for V11, V2, V14, V4, V6 and V3 are positive, while
+the loading for V12 is negative. Therefore, an interpretation of the second principal component is that
 it represents a contrast between the concentrations of V11, V2, V14, V4, V6 and V3, and the concentration of
-V12. Note that the loadings for V11 (-0.530) and V2 (-0.484) are the largest, so the contrast is mainly between
+V12. Note that the loadings for V11 (0.530) and V2 (0.484) are the largest, so the contrast is mainly between
 the concentrations of V11 and V2, and the concentration of V12.
 
 Scatterplots of the Principal Components
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The values of the principal components are stored in a named element "scores" of the variable returned by
-"princomp()". This contains a matrix with the principal components, where the first column in the matrix
+The values of the principal components are stored in a named element "x" of the variable returned by
+"prcomp()". This contains a matrix with the principal components, where the first column in the matrix
 contains the first principal component, the second column the second component, and so on.
 
-Thus, in our example, "wine.pca$scores[,1]" contains the first principal component, and 
-"wine.pca$scores[,2]" contains the second principal component. 
+Thus, in our example, "wine.pca$x[,1]" contains the first principal component, and 
+"wine.pca$x[,2]" contains the second principal component. 
 
 We can make a scatterplot of the first two principal components, and label the data points with the cultivar that the wine
 samples come from, by typing:
 
 ::
 
-    > plot(wine.pca$scores[,1],wine.pca$scores[,2]) # make a scatterplot
-    > text(wine.pca$scores[,1],wine.pca$scores[,2], wine$V1, cex=0.7, pos=4, col="red") # add labels
+    > plot(wine.pca$x[,1],wine.pca$x[,2]) # make a scatterplot
+    > text(wine.pca$x[,1],wine.pca$x[,2], wine$V1, cex=0.7, pos=4, col="red") # add labels
 
 |image7|
 
@@ -1067,16 +1060,26 @@ This means that the first discriminant function is a linear combination of the v
 where Z2, Z3,...Z14 are group-standardised versions of V2,V3...V14 (standardised so that
 the within-group variance is 1 for each variable).
 xxx are the loadings in R given for group-standardised versions??? get different loadings in R and SPSS.
-
 xxx check if I can get out the values using these loadings.
 
-Similarly the second disriminant function is the linear combination:
-0.724*Z2 + 0.331*Z3 + 0.648*Z4 - 0.516*Z5 - 0.005*Z6 - 0.041*Z7 - 0.402*Z8
-- 0.193*Z9 - 0.180*Z10 + 0.542*Z11 - 0.336*Z12 + 0.080*Z13 + 0.942*Z14,
-where Z2, Z3, Z14 are group-standardised versions of V2,V3...V14.
+In the first discriminant function, the largest loadings (in absolute) value are given to V8 (-1.683), V11 (0.853),
+V13 (-0.819) and V14 (-0.798). The loadings for V8, V13 and V14 are negative, while that for V11 is positive.
+Therefore, the discriminant function seems to represent a contrast between the concentrations of V8, V13 and V14,
+and the concentration of V11.
 
-xxx Interpret the discriminant function, and explain why the loadings are not surprising given Table 6 and the 
-covariances given in part (a)(ii). 
+We saw above that the individual variables which gave the greatest separations between the groups were V8
+(separation 2.67), V14 (2.38), V13 (2.17), V2 (1.54) and V11 (1.38). These were the same variables that had the largest
+loadings in the linear discriminant function (loading for V8: -1.683, for V14: -0.798, for V13: -0.819, for V11: 0.853). 
+
+xxx Should check whether the variables V8 and V11/V14?? have a negative between-groups variance and a positive within-groups variance.
+When the between-groups covariance and within-groups covariance for two variables have opposite signs, it 
+indicates that a better separation between groups can be obtained by using
+a linear combination of those two variables than by using either variable on its own.
+
+xxx Thus, given that the two variables V8 and
+V11/V14?? have between-groups and within-groups covariances of opposite signs, and that these are the two variables that
+gave the greatest separations between groups when used individually, it is not surprising that these are the two variables that
+have the largest loadings in the first discriminant function.
 
 Separation Achieved by the Discriminant Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1118,6 +1121,21 @@ that achieves a far greater separation between groups than achieved by any one v
 
 xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations", but
 this doesn't seem to be the square root of separation
+
+A Stacked Histogram of the LDA Values
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A nice way of displaying the results of a linear discriminant analysis (LDA) is to make a stacked histogram of the
+values of the discriminant function for the samples from different groups (different wine cultivars in our example).
+
+We can do this using the "ldahist()" function in R. For example, to make a stacked histogram of the first discriminant
+function's values for wine samples of the three different wine cultivars, we type: 
+
+::
+
+    > ldahist(data = wine.lda.values$x[,1], g=wine$V1)
+
+|image8|
 
 Links and Further Reading
 -------------------------
@@ -1164,7 +1182,7 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
 <http://creativecommons.org/licenses/by/3.0/>`_.
 
 .. |image1| image:: ../_static/image1.png
-            :width: 650
+            :width: 600
 .. |image2| image:: ../_static/image2.png
             :width: 400
 .. |image4| image:: ../_static/image4.png
@@ -1174,4 +1192,6 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
 .. |image6| image:: ../_static/image6.png
             :width: 400
 .. |image7| image:: ../_static/image7.png
+            :width: 400
+.. |image8| image:: ../_static/image8.png
             :width: 400
