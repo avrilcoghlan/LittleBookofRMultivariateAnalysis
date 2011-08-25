@@ -1191,11 +1191,28 @@ discussed above (see the discussion of percentage separation above).
 Scatterplots of the Principal Components
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+We can obtain a scatterplot of the best two discriminant functions, with the data points labelled by cultivar, by typing:
 
-% xxx Obtain a scatterplot of the Þrst two discriminant functions, with di?erent plotting symbols for the di?erent countries, and include this 
-% plot in your answer. Are the three countries well separated in this scatterplot? In addition, brießy discuss how well the countries are 
-% separated by the Þrst discriminant function alone and the second discriminant function alone. 
+::
 
+    > plot(wine.lda.values$x[,1],wine.lda.values$x[,2]) # make a scatterplot
+    > text(wine.lda.values$x[,1],wine.lda.values$x[,2],wine$V1,cex=0.7,pos=4,col="red") # add labels
+
+|image10|
+
+From the scatterplot of the first two discriminant functions, we can see that the wines from the three 
+cultivars are well separated in the scatterplot. The first discriminant function (x-axis)
+separates cultivars 1 and 3 very well, but doesn't not perfectly separate cultivars
+1 and 3, or cultivars 2 and 3. 
+
+The second discriminant function (y-axis) achieves a fairly good separation of cultivars
+1 and 3, and cultivars 2 and 3, although it is not totally perfect.
+
+To achieve a very good separation of the three cultivars, it would be best to use both the first and second 
+discriminant functions together, since the first discriminant function can separate cultivars 1 and 3 very well, 
+and the second discriminant function can separate cultivars 1 and 2, and cultivars 2 and 3, reasonably well.
+
+xxx Note: in SPSS I get different values of the LDA than in R, I think because I have different loadings xxx
 
 Links and Further Reading
 -------------------------
@@ -1257,4 +1274,5 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
             :width: 400
 .. |image9| image:: ../_static/image9.png
             :width: 400
-
+.. |image10| image:: ../_static/image10.png
+            :width: 400
