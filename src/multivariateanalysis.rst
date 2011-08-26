@@ -465,12 +465,28 @@ We can calculate the between-groups variance for a particular variable (eg. V2) 
             denomtotal <- denomtotal + denomi 
          } 
          # calculate the between-groups variance
-         Vb <- numtotal / (denomtotal - numlevels) 
+         #xxx old Vb <- numtotal / (denomtotal - numlevels) 
+         Vb <- numtotal / (numlevels - 1)
          Vb <- Vb[[1]]
          return(Vb)
       }
 
-.. I checked the formula, and it is fine.
+.. I checked the formula, and it is fine. xxx actually not! I think perhaps the denominator should be G-1
+
+.. xxx calcTotalSS <- function(variable)
+.. {
+..   variable <- variable[[1]]
+..   variablelen <- length(variable)
+..   print(paste("variablelen=",variablelen))
+..   grandmean <- mean(variable)
+..   print(paste("grandmean=",grandmean))
+..   totalss <- 0
+..   for (i in 1:variablelen)
+..  {
+..      totalss <- totalss + ((variable[i] - grandmean)*(variable[i] - grandmean)) 
+..   }
+..   return(totalss)
+.. }
 
 Once you have copied and pasted this function into R, you can use it to calculate the between-groups
 variance for a variable such as V2:
@@ -623,9 +639,8 @@ For example, to calculate the within-groups covariance for variables V2 and V3, 
 ..         #Covb <- Covb / (totallength - numlevels)
 ..         return(Covb)
 ..      }
-.. note something seems wrong with this function, does not give exactly the right answer.
-
-.. Also see Q3 part (a)(ii) of assignment 3 for interpretation of this.
+.. xxx note something seems wrong with this function, does not give exactly the right answer.
+.. xxx Also see Q3 part (a)(ii) of assignment 3 for interpretation of this.
 
 Calculating Correlations for Multivariate Data
 ----------------------------------------------
@@ -1150,8 +1165,28 @@ This means that the first discriminant function is a linear combination of the v
 - 0.197*Z9 + 0.067*Z10 + 0.853*Z11 - 0.205*Z12 - 0.205*Z12 - 0.819*Z13 - 0.798*Z14,
 where Z2, Z3,...Z14 are group-standardised versions of V2,V3...V14 (standardised so that
 the within-group variance is 1 for each variable).
-xxx are the loadings in R given for group-standardised versions??? get different loadings in R and SPSS.
-xxx check if I can get out the values using these loadings.
+.. If you look at the output of calcSeparations, you can see that the within-group variances are 1.
+.. The loadings are in wine.lda$scaling
+.. calcpc1(standardisedconcentrations, wine.lda$scaling[,1])
+..  [1] -4.58809783 -4.23347455 -3.33970270 -3.98646608 -1.48379058 -4.34104175 -4.34673463 -3.97703607
+..  [9] -3.75124782 -3.27238649 -4.67992868 -3.30729468 -3.54032601 -5.47080708 -5.30095956 -3.02624488
+..  [17] -3.13730522 -2.91788894 -5.04125373 -3.02672609 -3.54242137 -1.63969302 -4.77953266 -3.05859181
+..  [25] -3.30102167 -2.13305153 -3.86085651 -2.61716396 -3.50270776 -3.09507958 -2.92144446 -3.43885905
+..  [33] -3.36953028 -3.43108405 -2.76948273 -2.77747053 -2.67051715 -2.12040900 -3.03748771 -3.12763574
+..  [41] -2.90290406 -2.18503400 -4.55658618 -1.20609316 -2.59703715 -2.42614296 -3.77402391 -3.39412862
+..   ... 
+..  wine.lda.values <- predict(wine.lda, standardisedconcentrations)
+..  wine.lda.values$x[,1] # contains the values for the first discriminant function
+..  [1] -4.87604215 -4.52141887 -3.62764702 -4.27441040 -1.77173490 -4.62898607 -4.63467894 -4.26498039
+..  [9] -4.03919214 -3.56033081 -4.96787300 -3.59523900 -3.82827032 -5.75875140 -5.58890388 -3.31418920
+..  [17] -3.42524954 -3.20583326 -5.32919805 -3.31467041 -3.83036569 -1.92763734 -5.06747698 -3.34653613
+..  [25] -3.58896599 -2.42099585 -4.14880083 -2.90510828 -3.79065208 -3.38302390 -3.20938878 -3.72680337
+..  [33] -3.65747460 -3.71902837 -3.05742705 -3.06541485 -2.95846147 -2.40835332 -3.32543203 -3.41558006
+..  [41] -3.19084838 -2.47297832 -4.84453050 -1.49403748 -2.88498147 -2.71408728 -4.06196823 -3.68207294
+.. xxx am not sure why I don't get the same values as I get with predict()
+..  wine.lda.values2 <- predict(wine.lda, standardisedconcentrations, prior=c(1/3,1/3,1/3)) # gives the same values
+..
+.. xxx I get different loadings in R and SPSS, I'm not sure why.
 
 In the first discriminant function, the largest loadings (in absolute) value are given to V8 (-1.683), V11 (0.853),
 V13 (-0.819) and V14 (-0.798). The loadings for V8, V13 and V14 are negative, while that for V11 is positive.
@@ -1162,15 +1197,15 @@ We saw above that the individual variables which gave the greatest separations b
 (separation 2.67), V14 (2.38), V13 (2.17), V2 (1.54) and V11 (1.38). These were the same variables that had the largest
 loadings in the linear discriminant function (loading for V8: -1.683, for V14: -0.798, for V13: -0.819, for V11: 0.853). 
 
-xxx Should check whether the variables V8 and V11/V14?? have a negative between-groups variance and a positive within-groups variance.
-When the between-groups covariance and within-groups covariance for two variables have opposite signs, it 
-indicates that a better separation between groups can be obtained by using
-a linear combination of those two variables than by using either variable on its own.
-
-xxx Thus, given that the two variables V8 and
-V11/V14?? have between-groups and within-groups covariances of opposite signs, and that these are the two variables that
-gave the greatest separations between groups when used individually, it is not surprising that these are the two variables that
-have the largest loadings in the first discriminant function.
+.. xxx Should check whether the variables V8 and V11/V14?? have a negative between-groups variance and a positive within-groups variance.
+.. When the between-groups covariance and within-groups covariance for two variables have opposite signs, it 
+.. indicates that a better separation between groups can be obtained by using
+.. a linear combination of those two variables than by using either variable on its own.
+.. 
+.. xxx Thus, given that the two variables V8 and
+.. V11/V14?? have between-groups and within-groups covariances of opposite signs, and that these are the two variables that
+.. gave the greatest separations between groups when used individually, it is not surprising that these are the two variables that
+.. have the largest loadings in the first discriminant function.
 
 Separation Achieved by the Discriminant Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1210,8 +1245,8 @@ Therefore, the total separation is the sum of these, which is (9.06767320353267+
 first discriminant function is (9.07*100/13.21=) 68.64%, and the percentage separation achieved by the 
 second discriminant function is (4.14*100/13.21=) 31.36%.
    
-xxx The "proportion of trace" that is printed is the proportion of between-class variance that is explained by successive
-discriminant functions. xxx get 72.98% and 27.02% - does not agree with the percentage separation, which I get.
+.. xxx The "proportion of trace" that is printed is the proportion of between-class variance that is explained by successive
+.. discriminant functions. xxx get 72.98% and 27.02% - does not agree with the percentage separation, which I get.
 
 Therefore, the first discriminant function does achieve a good separation between the three groups (three cultivars), but the second
 discriminant function does improve the separation of the groups by quite a large amount, so is it worth using the 
@@ -1223,10 +1258,10 @@ was 2.67 for V8, which is quite a lot less than 9.07, the separation achieved by
 the effect of using more than one variable to calculate the discriminant function is that we can find a discriminant function
 that achieves a far greater separation between groups than achieved by any one variable alone.
 
-xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations", but
-this doesn't seem to be the square root of separation
+.. xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations", but
+.. this doesn't seem to be the square root of separation
 
-% xxx Write down the separation and percentage separation achieved by each discriminant function. 
+.. % xxx Write down the separation and percentage separation achieved by each discriminant function. 
 
 A Stacked Histogram of the LDA Values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1297,7 +1332,7 @@ To achieve a very good separation of the three cultivars, it would be best to us
 discriminant functions together, since the first discriminant function can separate cultivars 1 and 3 very well, 
 and the second discriminant function can separate cultivars 1 and 2, and cultivars 2 and 3, reasonably well.
 
-xxx Note: in SPSS I get different values of the LDA than in R, I think because I have different loadings xxx
+.. xxx Note: in SPSS I get different values of the LDA than in R, I think because I have different loadings xxx
 
 Allocation Rules and Misclassification Rate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
