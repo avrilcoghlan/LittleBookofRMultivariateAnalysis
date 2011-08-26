@@ -1165,6 +1165,7 @@ This means that the first discriminant function is a linear combination of the v
 - 0.197*Z9 + 0.067*Z10 + 0.853*Z11 - 0.205*Z12 - 0.205*Z12 - 0.819*Z13 - 0.798*Z14,
 where Z2, Z3,...Z14 are group-standardised versions of V2,V3...V14 (standardised so that
 the within-group variance is 1 for each variable).
+
 .. If you look at the output of calcSeparations, you can see that the within-group variances are 1.
 .. The loadings are in wine.lda$scaling
 .. calcpc1(standardisedconcentrations, wine.lda$scaling[,1])
