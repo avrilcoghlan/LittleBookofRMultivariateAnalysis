@@ -242,7 +242,7 @@ For example, to make a profile plot of the concentrations of the first five chem
 It is clear from the profile plot that the mean and standard deviation for V6 is
 quite a lot higher than that for the other variables.
 
-xxx why did they do quite a different profile plot in the assignment answer?
+.. xxx why did they do quite a different profile plot in the assignment answer?
 
 Calculating Summary Statistics for Multivariate Data
 ----------------------------------------------------
