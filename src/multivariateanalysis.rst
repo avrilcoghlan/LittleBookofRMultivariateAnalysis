@@ -544,8 +544,88 @@ for V8 here).
 Between-groups Covariance and Within-groups Covariance for Two Variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-xxx should also include functions for calculating between-groups covariance and within-groups covariance.
-Also see Q3 part (a)(ii) of assignment 3 for interpretation of this.
+If you have a multivariate data set with several variables describing sampling units from different groups,
+such as the wine samples from different cultivars, it is often of interest to calculate the within-groups
+covariance and between-groups variance for pairs of the variables. 
+
+This can be done using the following functions, which you will need to copy and paste into R to use them:
+
+::
+
+    > calcWithinGroupsCovariance <- function(variable1,variable2,groupvariable) 
+      {
+         # find out how many values the group variable can take
+         groupvariable2 <- as.factor(groupvariable[[1]])
+         levels <- levels(groupvariable2)
+         numlevels <- length(levels)
+         # get the covariance of variable 1 and variable 2 for each group:
+         Covw <- 0
+         for (i in 1:numlevels)
+         {
+            leveli <- levels[i]
+            levelidata1 <- variable1[groupvariable==leveli,]
+            levelidata2 <- variable2[groupvariable==leveli,]
+            mean1 <- mean(levelidata1)
+            mean2 <- mean(levelidata2)
+            levelilength <- length(levelidata1)
+            # get the covariance for this group:
+            term1 <- 0 
+            for (j in 1:levelilength)
+            {
+               term1 <- term1 + ((levelidata1[j] - mean1)*(levelidata2[j] - mean2))
+            }
+            Cov_groupi <- term1 # covariance for this group
+            Covw <- Covw + Cov_groupi 
+         }
+         totallength <- nrow(variable1)
+         Covw <- Covw / (totallength - numlevels)
+         return(Covw)
+      }
+
+.. Checked this works fine.
+
+For example, to calculate the within-groups covariance for variables V2 and V3, we type:
+
+::
+
+    > calcWithinGroupsCovariance(wine[2],wine[3],wine[1])
+      [1] 0.008173006 
+
+.. ::
+..
+..    > calcBetweenGroupsCovariance <- function(variable1,variable2,groupvariable) 
+..      {
+..         # find out how many values the group variable can take
+..         groupvariable2 <- as.factor(groupvariable[[1]])
+..         levels <- levels(groupvariable2)
+..         numlevels <- length(levels)
+..         # calculate the grand means
+..         variable1mean <- mean(variable1)
+..         variable2mean <- mean(variable2)
+..         # calculate the between-groups covariance
+..         Covb <- 0
+..         totallength <- nrow(variable1)
+..         for (i in 1:numlevels)
+..         {
+..            leveli <- levels[i]
+..            levelidata1 <- variable1[groupvariable==leveli,]
+..            levelidata2 <- variable2[groupvariable==leveli,]
+..            mean1 <- mean(levelidata1)
+..            mean2 <- mean(levelidata2)
+..           levelilength <- length(levelidata1)
+..            term1 <- ((mean1 - variable1mean)*(mean2 - variable2mean))
+..            term2 <- (levelilength)
+..            term3 <- term1 * (term2/totallength)
+..            print(paste("group i=",i,"term1=",term1,"term2=",term2,"term3=",term3,"levelilength=",levelilength))
+..            Covb <- Covb + term3  
+..         }
+..         #totallength <- nrow(variable1)
+..         #Covb <- Covb / (totallength - numlevels)
+..         return(Covb)
+..      }
+.. note something seems wrong with this function, does not give exactly the right answer.
+
+.. Also see Q3 part (a)(ii) of assignment 3 for interpretation of this.
 
 Calculating Correlations for Multivariate Data
 ----------------------------------------------
