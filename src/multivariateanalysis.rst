@@ -242,7 +242,7 @@ For example, to make a profile plot of the concentrations of the first five chem
 It is clear from the profile plot that the mean and standard deviation for V6 is
 quite a lot higher than that for the other variables.
 
-.. xxx why did they do quite a different profile plot in the assignment answer?
+.. xxx why did they do quite a different profile plot in the assignment answer? I sent a Q to the forum
 
 Calculating Summary Statistics for Multivariate Data
 ----------------------------------------------------
@@ -422,7 +422,7 @@ chemical's concentration), we can use the function "calcWithinGroupsVariance()" 
          return(Vw)
       }
 
-xxx need to check that this formula is correct.
+.. Checked that this formula is correct.
 
 You will need to copy and paste this function into R before you can use it.
 For example, to calculate the within-groups variance of the variable V2 (the concentration of the first chemical),
@@ -447,7 +447,7 @@ We can calculate the between-groups variance for a particular variable (eg. V2) 
          levels <- levels(groupvariable2)
          numlevels <- length(levels)
          # calculate the overall grand mean: 
-         grandmean <- mean(variable) # xxx is this formula ok?
+         grandmean <- mean(variable) 
          # get the mean and standard deviation for each group:
          numtotal <- 0
          denomtotal <- 0
@@ -470,7 +470,7 @@ We can calculate the between-groups variance for a particular variable (eg. V2) 
          return(Vb)
       }
 
-xxx need to check the formula
+.. I checked the formula, and it is fine.
 
 Once you have copied and pasted this function into R, you can use it to calculate the between-groups
 variance for a variable such as V2:
@@ -514,7 +514,7 @@ you can use the function "calcSeparations()" below:
          }
       }
 
-xxx need to check this is correct
+.. I checked the formula and it is fine.
 
 For example, to calculate the separations for each of the 13 chemical concentrations, we type:
 
@@ -535,7 +535,11 @@ For example, to calculate the separations for each of the 13 chemical concentrat
       [1] "variable V13 Vw= 0.160778729560982 Vb= 0.349068666907718 separation= 2.17111223518731"
       [1] "variable V14 Vw= 29707.6818705169 Vb= 70592.3693975409 separation= 2.37623284459632"
 
-xxx should probably say something about the interpretation of these values.
+Thus, the individual variable which gives the greatest separations between the groups (the wine cultivars) is 
+V8 (separation 2.67). As we will discuss below, the purpose of linear discriminant analysis (LDA) is to find the
+linear combination of the individual variables that will give the greatest separation between the groups (cultivars here).
+This hopefully will give a better separation than the best separation achievable by any individual variable (2.67
+for V8 here).
 
 Between-groups Covariance and Within-groups Covariance for Two Variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1371,7 +1375,7 @@ The content in this book is licensed under a `Creative Commons Attribution 3.0 L
 <http://creativecommons.org/licenses/by/3.0/>`_.
 
 .. |image1| image:: ../_static/image1.png
-            :width: 600
+            :width: 500
 .. |image2| image:: ../_static/image2.png
             :width: 400
 .. |image4| image:: ../_static/image4.png
