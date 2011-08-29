@@ -20,7 +20,7 @@ In the examples in this booklet, I will be using data sets from the UCI Machine
 Learning Repository, `http://archive.ics.uci.edu/ml <http://archive.ics.uci.edu/ml>`_.
 
 There is a pdf version of this booklet available at
-`https://github.com/avrilcoghlan/LittleBookofRTimeSeries/raw/master/_build/latex/MultivariateAnalysis.pdf <https://github.com/avrilcoghlan/LittleBookofRTimeSeries/raw/master/_build/latex/MultivariateAnalysis.pdf>`_.
+`https://github.com/avrilcoghlan/LittleBookofRTimeSeries/ raw/master/_build/latex/MultivariateAnalysis.pdf <https://github.com/avrilcoghlan/LittleBookofRTimeSeries/raw/master/_build/latex/MultivariateAnalysis.pdf>`_.
 
 If you like this booklet, you may also like to check out my booklet on using
 R for biomedical statistics, 
@@ -67,7 +67,8 @@ That is, we can read in the file using the read.table() function as follows:
 
 ::
 
-    > wine <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", sep=",")
+    > wine <- read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/wine/wine.data", 
+              sep=",")
     > wine
          V1    V2   V3   V4   V5  V6   V7   V8   V9  V10       V11   V12  V13  V14
      1    1 14.23 1.71 2.43 15.6 127 2.80 3.06 0.28 2.29  5.640000 1.040 3.92 1065
@@ -302,15 +303,15 @@ just the cultivar 2 samples:
 ::
 
     > mean(cultivar2wine[2:14])
-            V2         V3         V4         V5         V6         V7         V8         V9        V10        V11        V12 
-      12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845   0.363662   1.630282   3.086620   1.056282 
-            V13        V14 
-       2.785352 519.507042 
+        V2         V3         V4         V5         V6         V7         V8 
+      12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845 
+        V9        V10        V11        V12        V13        V14 
+      0.363662   1.630282   3.086620   1.056282   2.785352 519.507042 
     > sd(cultivar2wine[2:14]) 
-            V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
-      0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008   0.1239613   0.6020678   0.9249293 
-           V12         V13         V14 
-      0.2029368   0.4965735 157.2112204 
+        V2          V3          V4          V5          V6          V7          V8 
+      0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008 
+        V9         V10         V11         V12         V13         V14 
+      0.1239613   0.6020678   0.9249293   0.2029368   0.4965735 157.2112204 
 
 You can calculate the mean and standard deviation of the 13 chemicals' concentrations for just cultivar 1 samples,
 or for just cultivar 3 samples, in a similar way.
@@ -352,37 +353,39 @@ for each of the 13 chemical concentrations, for each of the three different wine
     > printMeanAndSdByGroup(wine[2:14],wine[1])
       [1] "Group 1 Group size: 59"
       [1] "Group 1 Means:"
-         V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
-      13.744746    2.010678    2.455593   17.037288  106.338983    2.840169    2.982373    0.290000    1.899322    5.528305 
-         V12         V13         V14 
-       1.062034    3.157797 1115.711864 
+         V2          V3          V4          V5          V6          V7          V8 
+      13.744746    2.010678    2.455593   17.037288  106.338983    2.840169    2.982373 
+         V9         V10         V11         V12         V13         V14 
+      0.290000    1.899322    5.528305    1.062034    3.157797 1115.711864 
       [1] "Group 1 Standard Deviations:"
-         V2           V3           V4           V5           V6           V7           V8           V9          V10 
-      0.46212536   0.68854886   0.22716598   2.54632245  10.49894932   0.33896135   0.39749361   0.07004924   0.41210923 
-         V11          V12          V13          V14 
-      1.23857281   0.11648264   0.35707658 221.52076659 
+          V2           V3           V4           V5           V6           V7 
+      0.46212536   0.68854886   0.22716598   2.54632245  10.49894932   0.33896135 
+          V8           V9          V10          V11          V12          V13 
+      0.39749361   0.07004924   0.41210923   1.23857281   0.11648264   0.35707658 
+         V14 
+      221.52076659 
       [1] "Group 2 Group size: 71"
       [1] "Group 2 Means:"
-         V2         V3         V4         V5         V6         V7         V8         V9        V10        V11        V12 
-      12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845   0.363662   1.630282   3.086620   1.056282 
-         V13        V14 
-      2.785352 519.507042 
+        V2         V3         V4         V5         V6         V7         V8 
+      12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845 
+        V9        V10        V11        V12        V13        V14 
+      0.363662   1.630282   3.086620   1.056282   2.785352 519.507042 
       [1] "Group 2 Standard Deviations:"
-         V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
-      0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008   0.1239613   0.6020678   0.9249293 
-         V12         V13         V14 
-      0.2029368   0.4965735 157.2112204 
+         V2          V3          V4          V5          V6          V7          V8 
+      0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008 
+         V9         V10         V11         V12         V13         V14 
+      0.1239613   0.6020678   0.9249293   0.2029368   0.4965735 157.2112204 
       [1] "Group 3 Group size: 48"
       [1] "Group 3 Means:"
-         V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
-      13.1537500   3.3337500   2.4370833  21.4166667  99.3125000   1.6787500   0.7814583   0.4475000   1.1535417   7.3962500 
-         V12         V13         V14 
-      0.6827083   1.6835417 629.8958333 
+         V2          V3          V4          V5          V6          V7          V8 
+      13.1537500   3.3337500   2.4370833  21.4166667  99.3125000   1.6787500   0.7814583 
+         V9         V10         V11         V12         V13         V14 
+      0.4475000   1.1535417   7.3962500   0.6827083   1.6835417 629.8958333 
       [1] "Group 3 Standard Deviations:"
-         V2          V3          V4          V5          V6          V7          V8          V9         V10         V11 
-      0.5302413   1.0879057   0.1846902   2.2581609  10.8904726   0.3569709   0.2935041   0.1241396   0.4088359   2.3109421 
-         V12         V13         V14 
-      0.1144411   0.2721114 115.0970432 
+         V2          V3          V4          V5          V6          V7          V8 
+      0.5302413   1.0879057   0.1846902   2.2581609  10.8904726   0.3569709   0.2935041 
+         V9         V10         V11         V12         V13         V14 
+      0.1241396   0.4088359   2.3109421   0.1144411   0.2721114 115.0970432 
 
 The function "printMeanAndSdByGroup()" also prints out the number of samples in each group. In this case,
 we see that there are 59 samples of cultivar 1, 71 of cultivar 2, and 48 of cultivar 3.
@@ -711,7 +714,8 @@ very easily which pair of variables are most highly correlated.
       {
          # find the correlations
          cormatrix <- cor(mydataframe)
-         # set the correlations on the diagonal or lower triangle to zero, so they will not be reported as the highest ones:
+         # set the correlations on the diagonal or lower triangle to zero, 
+         # so they will not be reported as the highest ones:
          diag(cormatrix) <- 0
          cormatrix[lower.tri(cormatrix)] <- 0
          # find the dimensions of the matrix, and the row names:
@@ -801,10 +805,12 @@ has a mean of 0 and a standard deviation of 1 by typing:
 ::
 
     > mean(standardisedconcentrations) 
-           V2            V3            V4            V5            V6            V7            V8            V9           V10 
-      -8.591766e-16 -6.776446e-17  8.045176e-16 -7.720494e-17 -4.073935e-17 -1.395560e-17  6.958263e-17 -1.042186e-16 -1.221369e-16 
-           V11           V12           V13           V14 
-      3.649376e-17  2.093741e-16  3.003459e-16 -1.034429e-16 
+           V2            V3            V4            V5            V6            V7 
+      -8.591766e-16 -6.776446e-17  8.045176e-16 -7.720494e-17 -4.073935e-17 -1.395560e-17 
+           V8            V9           V10           V11           V12           V13 
+      6.958263e-17 -1.042186e-16 -1.221369e-16  3.649376e-17  2.093741e-16  3.003459e-16 
+          V14 
+      -1.034429e-16 
     > sd(standardisedconcentrations)
       V2  V3  V4  V5  V6  V7  V8  V9 V10 V11 V12 V13 V14 
       1   1   1   1   1   1   1   1   1   1   1   1   1 
@@ -1085,21 +1091,21 @@ standardised concentration variables in each cultivar, using the "printMeanAndSd
 
     > printMeanAndSdByGroup(standardisedconcentrations,wine[1])
       [1] "Group 1 Means:"
-           V2         V3         V4         V5         V6         V7         V8         V9        V10 
-      0.9166093 -0.2915199  0.3246886 -0.7359212  0.4619232  0.8709055  0.9541923 -0.5773564  0.5388633 
-           V11        V12        V13        V14 
-      0.2028288  0.4575567  0.7691811  1.1711967 
+        V2         V3         V4         V5         V6         V7         V8 
+      0.9166093 -0.2915199  0.3246886 -0.7359212  0.4619232  0.8709055  0.9541923 
+        V9        V10        V11        V12        V13        V14 
+      -0.5773564  0.5388633  0.2028288  0.4575567  0.7691811  1.1711967 
       [1] "Group 2 Means:"
-           V2          V3          V4          V5          V6          V7          V8          V9 
-      -0.88921161 -0.36134241 -0.44370614  0.22250941 -0.36354162 -0.05790375  0.05163434  0.01452785 
-           V10         V11         V12         V13         V14 
-      0.06880790 -0.85039994  0.43239084  0.24460431 -0.72207310 
+         V2          V3          V4          V5          V6          V7          V8 
+      -0.88921161 -0.36134241 -0.44370614  0.22250941 -0.36354162 -0.05790375  0.05163434 
+         V9         V10         V11         V12         V13         V14 
+      0.01452785  0.06880790 -0.85039994  0.43239084  0.24460431 -0.72207310 
       [1] "Group 3 Means:"
-           V2          V3          V4          V5          V6          V7          V8          V9 
-       0.18862653  0.89281222  0.25721896  0.57544128 -0.03004191 -0.98483874 -1.24923710  0.68817813 
-           V10         V11         V12         V13         V14 
-      -0.76413110  1.00857281 -1.20199161 -1.30726231 -0.37152953 
- 
+         V2          V3          V4          V5          V6          V7          V8 
+      0.18862653  0.89281222  0.25721896  0.57544128 -0.03004191 -0.98483874 -1.24923710 
+         V9         V10         V11         V12         V13         V14 
+      0.68817813 -0.76413110  1.00857281 -1.20199161 -1.30726231 -0.37152953 
+
 Does it make sense that the first principal component can separate cultivar 1 from cultivar 3?
 In cultivar 1, the mean values of V8 (0.954), V7 (0.871), V13 (0.769), V10 (0.539), V12 (0.458) and V14 (1.171)
 are very high compared to the mean values of V9 (-0.577), V3 (-0.292) and V5 (-0.736).
@@ -1151,10 +1157,12 @@ For example, to carry out a linear discriminant analysis using the 13 chemical c
 
     > library("MASS")                                                # load the MASS package
     > standardisedconcentrations <- as.data.frame(scale(wine[2:14])) # standardise the variables
-    > wine.lda <- lda(wine$V1 ~ standardisedconcentrations$V2 + standardisedconcentrations$V3 + standardisedconcentrations$V4 +
-                                standardisedconcentrations$V5 + standardisedconcentrations$V6 + standardisedconcentrations$V7 + 
-                                standardisedconcentrations$V8 + standardisedconcentrations$V9 + standardisedconcentrations$V10 +
-                                standardisedconcentrations$V11 + standardisedconcentrations$V12 + standardisedconcentrations$V13 +
+    > wine.lda <- lda(wine$V1 ~ standardisedconcentrations$V2 + standardisedconcentrations$V3 + 
+                                standardisedconcentrations$V4 + standardisedconcentrations$V5 + 
+                                standardisedconcentrations$V6 + standardisedconcentrations$V7 + 
+                                standardisedconcentrations$V8 + standardisedconcentrations$V9 + 
+                                standardisedconcentrations$V10 + standardisedconcentrations$V11 + 
+                                standardisedconcentrations$V12 + standardisedconcentrations$V13 +
                                 standardisedconcentrations$V14, prior=c(1/3,1/3,1/3))
                     
 As for the PCA, it is a good idea to standardise your variables before carrying out a LDA, if the
@@ -1461,7 +1469,8 @@ We can examine the accuracy of this allocation rule by using the "calcAllocation
                }
                trues <- results["TRUE"]
                trues <- trues[[1]]
-               print(paste("Number of samples of group",leveli,"classified as group",levelj," : ",trues,"(cutoffs:",cutoff1,",",cutoff2,")"))
+               print(paste("Number of samples of group",leveli,"classified as group",levelj," : ",
+                  trues,"(cutoffs:",cutoff1,",",cutoff2,")"))
             }
          }
       }
