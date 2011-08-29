@@ -1193,20 +1193,20 @@ This means that the first discriminant function is a linear combination of the v
 where Z2, Z3,...Z14 are group-standardised versions of V2,V3...V14 (standardised so that
 the within-group variance is 1 for each variable).
 
-
-.. If you look at the output of calcSeparations, you can see that the within-group variances are 1.
-.. The loadings are in wine.lda$scaling, I think.
-.. The description for "scaling" in the help for lda() is:
-.. 'a matrix which transforms observations to discriminant functions, normalized so that within groups 
-..  covariance matrix is spherical. '
-.. calcpc1(standardisedconcentrations, wine.lda$scaling[,1])
+..  Comment:
+..  If you look at the output of calcSeparations, you can see that the within-group variances are 1.
+..  The loadings are in wine.lda$scaling, I think.
+..  The description for scaling in the help for lda() is:
+..  a matrix which transforms observations to discriminant functions, normalized so that within groups 
+..  covariance matrix is spherical. 
+..  calcpc1(standardisedconcentrations, wine.lda$scaling[,1])
 ..  [1] -4.58809783 -4.23347455 -3.33970270 -3.98646608 -1.48379058 -4.34104175 -4.34673463 -3.97703607
 ..  [9] -3.75124782 -3.27238649 -4.67992868 -3.30729468 -3.54032601 -5.47080708 -5.30095956 -3.02624488
 ..  [17] -3.13730522 -2.91788894 -5.04125373 -3.02672609 -3.54242137 -1.63969302 -4.77953266 -3.05859181
 ..  [25] -3.30102167 -2.13305153 -3.86085651 -2.61716396 -3.50270776 -3.09507958 -2.92144446 -3.43885905
 ..  [33] -3.36953028 -3.43108405 -2.76948273 -2.77747053 -2.67051715 -2.12040900 -3.03748771 -3.12763574
 ..  [41] -2.90290406 -2.18503400 -4.55658618 -1.20609316 -2.59703715 -2.42614296 -3.77402391 -3.39412862
-..   ... 
+..  ... 
 ..  wine.lda.values <- predict(wine.lda, standardisedconcentrations)
 ..  wine.lda.values$x[,1] # contains the values for the first discriminant function
 ..  [1] -4.87604215 -4.52141887 -3.62764702 -4.27441040 -1.77173490 -4.62898607 -4.63467894 -4.26498039
