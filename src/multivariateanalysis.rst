@@ -1193,6 +1193,7 @@ This means that the first discriminant function is a linear combination of the v
 where Z2, Z3,...Z14 are group-standardised versions of V2,V3...V14 (standardised so that
 the within-group variance is 1 for each variable).
 
+
 .. If you look at the output of calcSeparations, you can see that the within-group variances are 1.
 .. The loadings are in wine.lda$scaling, I think.
 .. The description for "scaling" in the help for lda() is:
@@ -1224,6 +1225,7 @@ the within-group variance is 1 for each variable).
 .. xxx I get different loadings in R and SPSS, I'm not sure why xxx. I'm not sure if it is because
 .. SPSS gives loadings for the standardised data (with mean 0 and variance 1) while R gives the
 .. loadings for group-standardised data (so within-groups variance is 1 for each group)???
+
 
 In the first discriminant function, the largest loadings (in absolute) value are given to V8 (-1.683), V11 (0.853),
 V13 (-0.819) and V14 (-0.798). The loadings for V8, V13 and V14 are negative, while that for V11 is positive.
