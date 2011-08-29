@@ -503,8 +503,8 @@ within-groups variance. Thus, the separation achieved by V2 is calculated as:
 
 ::
 
-    > 0.404542/0.2620525
-      [1] 1.543744
+    > 35.39742/0.2620525
+      [1] 135.0776 
 
 .. Note I think we can also get the within-groups and between-groups variance from the output of ANOVA:
 .. 
@@ -516,7 +516,8 @@ within-groups variance. Thus, the separation achieved by V2 is calculated as:
 .. Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 ..
 .. Here the within-groups variance is 0.262 (called the mean square of residuals)
-.. and the between-groups variance is 35.397.
+.. and the between-groups variance is 35.397. The ratio is 135.08 (the F statistic), which
+.. is the same as the separation that I calculate (see above).
 
 If you want to calculate the separations achieved by all of the variables in a multivariate data set,
 you can use the function "calcSeparations()" below:
@@ -614,12 +615,12 @@ This can be done using the following functions, which you will need to copy and 
 .. Agrees with formula from Kryzanowski's 'Principles of Multivariate Analysis' pages 294-295:
 .. Covw = (1/(N-G)) Sum(from g=1 to G) [ Sum(over i) { (x_ig - x_hat_g)*(y_ig - y_hat_g) } ]
 
-For example, to calculate the within-groups covariance for variables V2 and V3, we type:
+For example, to calculate the within-groups covariance for variables V8 and V11, we type:
 
 ::
 
-    > calcWithinGroupsCovariance(wine[2],wine[3],wine[1])
-      [1] 0.008173006 
+    > calcWithinGroupsCovariance(wine[8],wine[11],wine[1])
+      [1] 0.2866783 
 
 ::
 
@@ -646,20 +647,27 @@ For example, to calculate the within-groups covariance for variables V2 and V3, 
             Covb <- Covb + term1  
          }
          Covb <- Covb / (numlevels - 1)
+         Covb <- Covb[[1]]
          return(Covb)
       }
-.. xxx note something seems wrong with this function, does not give exactly the right answer.
-.. xxx Also see Q3 part (a)(ii) of assignment 3 for interpretation of this.
+
+.. xxx Something seems wrong with this function, does not give exactly the right answer, as
+.. xxx it doesn't give me the answer given for the example in Q3 of assignment 3(a)(ii) for the OU
 .. Formula from Kryzanowski's 'Principles of Multivariate Analysis' pages 294-295
 .. Covb = (1/(G-1)) * Sum(from g=1 to G) [ Sum(over i) { (n_g) * (x_hat_g - x_hat) * (y_hat_g - y_hat) } ]
 
-For example, to calculate the between-groups covariance for variables V2 and V3, we type:
+For example, to calculate the between-groups covariance for variables V8 and V11, we type:
 
 ::
 
-    > calcBetweenGroupsCovariance(wine[2],wine[3],wine[1])
-      [1] 6.861463
+    > calcBetweenGroupsCovariance(wine[8],wine[11],wine[1])
+      [1] -60.41077
 
+Thus, for V8 and V11, the between-groups covariance is -60.41 and the within-groups covariance is 0.29.
+Since the within-groups covariance is positive (0.29), it means V8 and V11 are positively related within groups:
+for individuals from the same group, individuals with a high value of V8 tend to have a high value of V11, 
+and vice versa. Since the between-groups covariance is negative (-60.41), V8 and V11 are negatively related between groups:
+groups with a high mean value of V8 tend to have a low mean value of V11, and vice versa.
 
 Calculating Correlations for Multivariate Data
 ----------------------------------------------
@@ -1186,7 +1194,10 @@ where Z2, Z3,...Z14 are group-standardised versions of V2,V3...V14 (standardised
 the within-group variance is 1 for each variable).
 
 .. If you look at the output of calcSeparations, you can see that the within-group variances are 1.
-.. The loadings are in wine.lda$scaling
+.. The loadings are in wine.lda$scaling, I think.
+.. The description for "scaling" in the help for lda() is:
+.. 'a matrix which transforms observations to discriminant functions, normalized so that within groups 
+..  covariance matrix is spherical. '
 .. calcpc1(standardisedconcentrations, wine.lda$scaling[,1])
 ..  [1] -4.58809783 -4.23347455 -3.33970270 -3.98646608 -1.48379058 -4.34104175 -4.34673463 -3.97703607
 ..  [9] -3.75124782 -3.27238649 -4.67992868 -3.30729468 -3.54032601 -5.47080708 -5.30095956 -3.02624488
@@ -1203,10 +1214,16 @@ the within-group variance is 1 for each variable).
 ..  [25] -3.58896599 -2.42099585 -4.14880083 -2.90510828 -3.79065208 -3.38302390 -3.20938878 -3.72680337
 ..  [33] -3.65747460 -3.71902837 -3.05742705 -3.06541485 -2.95846147 -2.40835332 -3.32543203 -3.41558006
 ..  [41] -3.19084838 -2.47297832 -4.84453050 -1.49403748 -2.88498147 -2.71408728 -4.06196823 -3.68207294
-.. xxx am not sure why I don't get the same values as I get with predict()
+..  Note that I think that the reason that I don't get the same value using calcpc1() as using
+..  predict() is that "standardisedconcentrations" contain the concentrations standardised so that they
+..  have a mean of 0 and variance of 1, while the loadings from wine.lda$scaling are for the concentrations
+..  standardised so that the within-group variance for each group (cultivar) is 1, and this isn't ensured
+..  in "standardisedconcentrations".
 ..  wine.lda.values2 <- predict(wine.lda, standardisedconcentrations, prior=c(1/3,1/3,1/3)) # gives the same values
 ..
-.. xxx I get different loadings in R and SPSS, I'm not sure why.
+.. xxx I get different loadings in R and SPSS, I'm not sure why xxx. I'm not sure if it is because
+.. SPSS gives loadings for the standardised data (with mean 0 and variance 1) while R gives the
+.. loadings for group-standardised data (so within-groups variance is 1 for each group)???
 
 In the first discriminant function, the largest loadings (in absolute) value are given to V8 (-1.683), V11 (0.853),
 V13 (-0.819) and V14 (-0.798). The loadings for V8, V13 and V14 are negative, while that for V11 is positive.
@@ -1215,17 +1232,16 @@ and the concentration of V11.
 
 We saw above that the individual variables which gave the greatest separations between the groups were V8
 (separation 233.93), V14 (207.92), V13 (189.97), V2 (135.08) and V11 (120.66). These were the same variables that had the largest
-loadings in the linear discriminant function (loading for V8: -1.683, for V14: -0.798, for V13: -0.819, for V11: 0.853). 
+loadings in the linear discriminant function (loading for V8: -1.683, for V14: -0.798, for V13: -0.819, for V11: 0.853),
 
-.. xxx Should check whether the variables V8 and V11/V14?? have a negative between-groups variance and a positive within-groups variance.
-.. When the between-groups covariance and within-groups covariance for two variables have opposite signs, it 
-.. indicates that a better separation between groups can be obtained by using
-.. a linear combination of those two variables than by using either variable on its own.
-.. 
-.. xxx Thus, given that the two variables V8 and
-.. V11/V14?? have between-groups and within-groups covariances of opposite signs, and that these are the two variables that
-.. gave the greatest separations between groups when used individually, it is not surprising that these are the two variables that
-.. have the largest loadings in the first discriminant function.
+We found above that variables V8 and V11 have a negative between-groups covariance (-60.41) and a positive
+within-groups covariance (0.29). When the between-groups covariance and within-groups covariance for two variables have opposite signs, it 
+indicates that a better separation between groups can be obtained by using a linear combination of those two variables than by using 
+either variable on its own.
+
+Thus, given that the two variables V8 and V11 have between-groups and within-groups covariances of opposite signs, and that these 
+are two of the variables that gave the greatest separations between groups when used individually, it is not surprising that these 
+are the two variables that have the largest loadings in the first discriminant function.
 
 Separation Achieved by the Discriminant Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1261,12 +1277,16 @@ Thus, the separation achieved by the first (best) discriminant function is 793.4
 achieved by the second (second best) discriminant function is 362.5.
 
 Therefore, the total separation is the sum of these, which is (793.421405309108+362.471836750562=1155.893) 
-1155.89, rounded to two decimal places. Therefore, the percentage separation achieved by the
+1155.89, rounded to two decimal places. Therefore, the "percentage separation" achieved by the
 first discriminant function is (793.421405309108*100/1155.893=) 68.64%, and the percentage separation achieved by the 
 second discriminant function is (362.471836750562*100/1155.893=) 31.36%.
-   
-.. xxx The "proportion of trace" that is printed is the proportion of between-class variance that is explained by successive
-.. discriminant functions. xxx get 72.98% and 27.02% - does not agree with the percentage separation, which I get.
+
+.. The "proportion of trace" that is printed when you type "wine.lda" is the proportion of between-class variance that is 
+.. explained by successive discriminant functions. In this case it prints out: 72.98% and 27.02%. 
+.. For LD1, Vb=793.421405309108, for LD2, Vb=362.471836750562. Total Vb=362.471836750562+793.421405309108=1155.893.
+.. For LD1, Vb=793.421405309108, % of total Vb=793.421405309108*100/1155.893=68.64142.
+.. For LD2, Vb=362.471836750562, % of total Vb=362.471836750562*100/1155.893=31.3586.
+.. xxx Therefore, I'm not sure why I don't get values that agree with the print-out from wine.lda
 
 Therefore, the first discriminant function does achieve a good separation between the three groups (three cultivars), but the second
 discriminant function does improve the separation of the groups by quite a large amount, so is it worth using the 
@@ -1278,8 +1298,24 @@ was 233.9 for V8, which is quite a lot less than 793.4, the separation achieved 
 the effect of using more than one variable to calculate the discriminant function is that we can find a discriminant function
 that achieves a far greater separation between groups than achieved by any one variable alone.
 
-.. xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations", but
-.. this doesn't seem to be the square root of separation
+.. xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations, 
+.. on the linear discriminant variables. Their squares are the canonical F-statistics"
+.. In this case we get:
+.. [1] 29.95777 18.22846
+.. However, this doesn't seem to be the square root of separation that I calculate:
+.. for LD1, separation= 793.421405309108, sqrt(separation) = sqrt(793.421405309108) = 28.16774 xxx
+.. for LD2, separation = 362.471836750562, sqrt(separation) = sqrt(362.471836750562) = 19.03869 xxx
+.. Note the F statistics I get from aov() are the same as the separation values that I calculate:
+.. > summary(aov(wine.lda.values~as.factor(wine[,1])))
+.. Response LD1 :
+..                      Df Sum Sq Mean Sq F value    Pr(>F)    
+.. as.factor(wine[, 1])   2 1586.8  793.42  793.42 < 2.2e-16 ***
+.. Residuals            175  175.0    1.00                      
+.. --
+.. Response LD2 :
+..                      Df Sum Sq Mean Sq F value    Pr(>F)    
+.. as.factor(wine[, 1])   2 724.94  362.47  362.47 < 2.2e-16 ***
+.. Residuals            175 175.00    1.00                      
 
 .. % xxx Write down the separation and percentage separation achieved by each discriminant function. 
 
