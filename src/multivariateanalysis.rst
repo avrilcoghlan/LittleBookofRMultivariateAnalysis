@@ -1303,7 +1303,7 @@ that achieves a far greater separation between groups than achieved by any one v
 .. xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations, 
 .. on the linear discriminant variables. Their squares are the canonical F-statistics"
 .. In this case we get:
-.. [1] 29.95777 18.22846
+.. 29.95777 18.22846
 .. However, this doesn't seem to be the square root of separation that I calculate:
 .. for LD1, separation= 793.421405309108, sqrt(separation) = sqrt(793.421405309108) = 28.16774 xxx
 .. for LD2, separation = 362.471836750562, sqrt(separation) = sqrt(362.471836750562) = 19.03869 xxx
