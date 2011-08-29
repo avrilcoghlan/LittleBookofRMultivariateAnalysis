@@ -465,15 +465,15 @@ We can calculate the between-groups variance for a particular variable (eg. V2) 
             denomtotal <- denomtotal + denomi 
          } 
          # calculate the between-groups variance
-         #xxx old Vb <- numtotal / (denomtotal - numlevels) 
          Vb <- numtotal / (numlevels - 1)
          Vb <- Vb[[1]]
          return(Vb)
       }
 
-.. I checked the formula, and it is fine. xxx actually not! I think perhaps the denominator should be G-1
+.. In the OU book, I think that they have the wrong formula - had N-G as denominator, I sent an email to the forum xxx
 
-.. xxx calcTotalSS <- function(variable)
+.. Note the between-groups-variance*(G-1) + within-groups-variance*(N-G) should be equal to TotalSS
+..  calcTotalSS <- function(variable)
 .. {
 ..   variable <- variable[[1]]
 ..   variablelen <- length(variable)
@@ -494,9 +494,9 @@ variance for a variable such as V2:
 ::
 
     > calcBetweenGroupsVariance (wine[2],wine[1])
-      [1] 0.404542
+      [1] 35.39742 
 
-Thus, the between-groups variance of V2 is 0.404542.
+Thus, the between-groups variance of V2 is 35.39742.
 
 We can calculate the "separation" achieved by a variable as its between-groups variance devided by its
 within-groups variance. Thus, the separation achieved by V2 is calculated as:
@@ -505,6 +505,18 @@ within-groups variance. Thus, the separation achieved by V2 is calculated as:
 
     > 0.404542/0.2620525
       [1] 1.543744
+
+.. Note I think we can also get the within-groups and between-groups variance from the output of ANOVA:
+.. 
+.. summary(aov(wine[,2]~as.factor(wine[,1])))
+..                       Df Sum Sq Mean Sq F value    Pr(>F)    
+.. as.factor(wine[, 1])   2 70.795  35.397  135.08 < 2.2e-16 ***
+.. Residuals            175 45.859   0.262                      
+.. ---
+.. Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+..
+.. Here the within-groups variance is 0.262 (called the mean square of residuals)
+.. and the between-groups variance is 35.397.
 
 If you want to calculate the separations achieved by all of the variables in a multivariate data set,
 you can use the function "calcSeparations()" below:
@@ -537,24 +549,24 @@ For example, to calculate the separations for each of the 13 chemical concentrat
 ::
 
     > calcSeparations(wine[2:14],wine[1])
-      [1] "variable V2 Vw= 0.262052469153907 Vb= 0.404541999545934 separation= 1.54374427706057"
-      [1] "variable V3 Vw= 0.887546796746581 Vb= 0.37473163985053 separation= 0.422210571007813"
-      [1] "variable V4 Vw= 0.0660721013425184 Vb= 0.0100527012256999 separation= 0.152147442285612"
-      [1] "variable V5 Vw= 8.00681118121156 Vb= 3.2733342441496 separation= 0.408818713226392"
-      [1] "variable V6 Vw= 180.65777316441 Vb= 25.6628688901645 separation= 0.142052392435999"
-      [1] "variable V7 Vw= 0.191270475224227 Vb= 0.204895511934682 separation= 1.07123439566134"
-      [1] "variable V8 Vw= 0.274707514337437 Vb= 0.734413657412161 separation= 2.67343854493199"
-      [1] "variable V9 Vw= 0.0119117022132797 Vb= 0.00375394465670427 separation= 0.315147624536753"
-      [1] "variable V10 Vw= 0.246172943795542 Vb= 0.0851656629460314 separation= 0.345958664802601"
-      [1] "variable V11 Vw= 2.28492308133354 Vb= 3.15094858082634 separation= 1.37901735361146"
-      [1] "variable V12 Vw= 0.0244876469432414 Vb= 0.0283543990278662 separation= 1.157906233032"
-      [1] "variable V13 Vw= 0.160778729560982 Vb= 0.349068666907718 separation= 2.17111223518731"
-      [1] "variable V14 Vw= 29707.6818705169 Vb= 70592.3693975409 separation= 2.37623284459632"
-
+      [1] "variable V2 Vw= 0.262052469153907 Vb= 35.3974249602692 separation= 135.0776242428"
+      [1] "variable V3 Vw= 0.887546796746581 Vb= 32.7890184869213 separation= 36.9434249631837"
+      [1] "variable V4 Vw= 0.0660721013425184 Vb= 0.879611357248741 separation= 13.312901199991"
+      [1] "variable V5 Vw= 8.00681118121156 Vb= 286.41674636309 separation= 35.7716374073093"
+      [1] "variable V6 Vw= 180.65777316441 Vb= 2245.50102788939 separation= 12.4295843381499"
+      [1] "variable V7 Vw= 0.191270475224227 Vb= 17.9283572942847 separation= 93.7330096203673"
+      [1] "variable V8 Vw= 0.274707514337437 Vb= 64.2611950235641 separation= 233.925872681549"
+      [1] "variable V9 Vw= 0.0119117022132797 Vb= 0.328470157461624 separation= 27.5754171469659"
+      [1] "variable V10 Vw= 0.246172943795542 Vb= 7.45199550777775 separation= 30.2713831702276"
+      [1] "variable V11 Vw= 2.28492308133354 Vb= 275.708000822304 separation= 120.664018441003"
+      [1] "variable V12 Vw= 0.0244876469432414 Vb= 2.48100991493829 separation= 101.3167953903"
+      [1] "variable V13 Vw= 0.160778729560982 Vb= 30.5435083544253 separation= 189.972320578889"
+      [1] "variable V14 Vw= 29707.6818705169 Vb= 6176832.32228483 separation= 207.920373902178"
+ 
 Thus, the individual variable which gives the greatest separations between the groups (the wine cultivars) is 
-V8 (separation 2.67). As we will discuss below, the purpose of linear discriminant analysis (LDA) is to find the
+V8 (separation 233.9). As we will discuss below, the purpose of linear discriminant analysis (LDA) is to find the
 linear combination of the individual variables that will give the greatest separation between the groups (cultivars here).
-This hopefully will give a better separation than the best separation achievable by any individual variable (2.67
+This hopefully will give a better separation than the best separation achievable by any individual variable (233.9
 for V8 here).
 
 Between-groups Covariance and Within-groups Covariance for Two Variables
@@ -598,7 +610,9 @@ This can be done using the following functions, which you will need to copy and 
          return(Covw)
       }
 
-.. Checked this works fine.
+.. Checked this works fine. 
+.. Agrees with formula from Kryzanowski's 'Principles of Multivariate Analysis' pages 294-295:
+.. Covw = (1/(N-G)) Sum(from g=1 to G) [ Sum(over i) { (x_ig - x_hat_g)*(y_ig - y_hat_g) } ]
 
 For example, to calculate the within-groups covariance for variables V2 and V3, we type:
 
@@ -607,40 +621,50 @@ For example, to calculate the within-groups covariance for variables V2 and V3, 
     > calcWithinGroupsCovariance(wine[2],wine[3],wine[1])
       [1] 0.008173006 
 
-.. ::
-..
-..    > calcBetweenGroupsCovariance <- function(variable1,variable2,groupvariable) 
-..      {
-..         # find out how many values the group variable can take
-..         groupvariable2 <- as.factor(groupvariable[[1]])
-..         levels <- levels(groupvariable2)
-..         numlevels <- length(levels)
-..         # calculate the grand means
-..         variable1mean <- mean(variable1)
-..         variable2mean <- mean(variable2)
-..         # calculate the between-groups covariance
-..         Covb <- 0
-..         totallength <- nrow(variable1)
-..         for (i in 1:numlevels)
-..         {
-..            leveli <- levels[i]
-..            levelidata1 <- variable1[groupvariable==leveli,]
-..            levelidata2 <- variable2[groupvariable==leveli,]
-..            mean1 <- mean(levelidata1)
-..            mean2 <- mean(levelidata2)
-..           levelilength <- length(levelidata1)
-..            term1 <- ((mean1 - variable1mean)*(mean2 - variable2mean))
-..            term2 <- (levelilength)
-..            term3 <- term1 * (term2/totallength)
-..            print(paste("group i=",i,"term1=",term1,"term2=",term2,"term3=",term3,"levelilength=",levelilength))
-..            Covb <- Covb + term3  
-..         }
-..         #totallength <- nrow(variable1)
-..         #Covb <- Covb / (totallength - numlevels)
-..         return(Covb)
-..      }
+::
+
+    > calcBetweenGroupsCovariance <- function(variable1,variable2,groupvariable) 
+      {
+         # find out how many values the group variable can take
+         groupvariable2 <- as.factor(groupvariable[[1]])
+         levels <- levels(groupvariable2)
+         numlevels <- length(levels)
+         # calculate the grand means
+         variable1mean <- mean(variable1)
+         variable2mean <- mean(variable2)
+         # calculate the between-groups covariance
+         Covb <- 0
+         #xxxtotallength <- nrow(variable1)
+         for (i in 1:numlevels)
+         {
+            leveli <- levels[i]
+            levelidata1 <- variable1[groupvariable==leveli,]
+            levelidata2 <- variable2[groupvariable==leveli,]
+            mean1 <- mean(levelidata1)
+            mean2 <- mean(levelidata2)
+            levelilength <- length(levelidata1)
+            term1 <- ((mean1 - variable1mean)*(mean2 - variable2mean))
+            term2 <- (levelilength)
+            term3 <- term1 * (term2)
+            print(paste("group i=",i,"term1=",term1,"term2=",term2,"term3=",term3,"levelilength=",levelilength))
+            Covb <- Covb + term3  
+         }
+         #xxxtotallength <- nrow(variable1)
+         Covb <- Covb / (numlevels - 1)
+         return(Covb)
+      }
 .. xxx note something seems wrong with this function, does not give exactly the right answer.
 .. xxx Also see Q3 part (a)(ii) of assignment 3 for interpretation of this.
+.. Formula from Kryzanowski's 'Principles of Multivariate Analysis' pages 294-295
+.. Covb = (1/(G-1)) * Sum(from g=1 to G) [ Sum(over i) { (n_g) * (x_hat_g - x_hat) * (y_hat_g - y_hat) } ]
+
+For example, to calculate the between-groups covariance for variables V2 and V3, we type:
+
+::
+
+    > calcBetweenGroupsCovariance(wine[2],wine[3],wine[1])
+      [1] 6.861463
+
 
 Calculating Correlations for Multivariate Data
 ----------------------------------------------
@@ -790,8 +814,8 @@ Principal Component Analysis
 
 The purpose of principal component analysis is to find the best low-dimensional representation of the variation in a
 multivariate data set. For example, in the case of the wine data set, we have 13 chemical concentrations describing
-wine samples from three different cultivars. We can carry out a principal component analysis to investigate 
-whether wine samples from different cultivars can be distinguished by a smaller number of new variables (principal
+wine samples from three different cultivars. We can carry out a principal component analysis to investigate
+whether we can capture most of the variation between samples using a smaller number of new variables (principal
 components), where each of these new variables is a linear combination of all or some of the 13 chemical concentrations.
 
 To carry out a principal component analysis (PCA) on a multivariate data set, the first step is often to standardise
@@ -1098,10 +1122,10 @@ Linear Discriminant Analysis
 ----------------------------
 
 The purpose of principal component analysis is to find the best low-dimensional representation of the variation in a
-multivariate data set. For example, in the wine data set, we have 13 chemical concentrations describing wine samples
-from three different cultivars. By carrying out a principal component analysis, we found that the three cultivars can
-be distinguished based on the first two principal components, where each of the principal components is a particular linear
-combination of the 13 chemical concentrations.
+multivariate data set. For example, in the wine data set, we have 13 chemical concentrations describing wine samples from three cultivars. 
+By carrying out a principal component analysis, we found that most of the variation in the chemical concentrations
+between the samples can be captured using the first two principal components, 
+where each of the principal components is a particular linear combination of the 13 chemical concentrations.
 
 The purpose of linear discriminant analysis (LDA) is to find the linear combinations of the original variables (the 13
 chemical concentrations here) that gives the best possible separation between the groups (wine cultivars here) in our
@@ -1195,7 +1219,7 @@ Therefore, the discriminant function seems to represent a contrast between the c
 and the concentration of V11.
 
 We saw above that the individual variables which gave the greatest separations between the groups were V8
-(separation 2.67), V14 (2.38), V13 (2.17), V2 (1.54) and V11 (1.38). These were the same variables that had the largest
+(separation 233.93), V14 (207.92), V13 (189.97), V2 (135.08) and V11 (120.66). These were the same variables that had the largest
 loadings in the linear discriminant function (loading for V8: -1.683, for V14: -0.798, for V13: -0.819, for V11: 0.853). 
 
 .. xxx Should check whether the variables V8 and V11/V14?? have a negative between-groups variance and a positive within-groups variance.
@@ -1235,16 +1259,16 @@ variance to the within-groups variance:
 ::
 
     > calcSeparations(wine.lda.values$x,wine[1])
-      [1] "variable LD1 Vw= 1 Vb= 9.06767320353267 separation= 9.06767320353267"
-      [1] "variable LD2 Vw= 1 Vb= 4.14253527714928 separation= 4.14253527714928"
+      [1] "variable LD1 Vw= 1 Vb= 793.421405309108 separation= 793.421405309108"
+      [1] "variable LD2 Vw= 1 Vb= 362.471836750562 separation= 362.471836750562"
 
-Thus, the separation achieved by the first (best) discriminant function is 9.07, and the separation
-achieved by the second (second best) discriminant function is 4.14.
+Thus, the separation achieved by the first (best) discriminant function is 793.4, and the separation
+achieved by the second (second best) discriminant function is 362.5.
 
-Therefore, the total separation is the sum of these, which is (9.06767320353267+4.14253527714928=13.21021) 
-13.21, rounded to two decimal places. Therefore, the percentage separation achieved by the
-first discriminant function is (9.07*100/13.21=) 68.64%, and the percentage separation achieved by the 
-second discriminant function is (4.14*100/13.21=) 31.36%.
+Therefore, the total separation is the sum of these, which is (793.421405309108+362.471836750562=1155.893) 
+1155.89, rounded to two decimal places. Therefore, the percentage separation achieved by the
+first discriminant function is (793.421405309108*100/1155.893=) 68.64%, and the percentage separation achieved by the 
+second discriminant function is (362.471836750562*100/1155.893=) 31.36%.
    
 .. xxx The "proportion of trace" that is printed is the proportion of between-class variance that is explained by successive
 .. discriminant functions. xxx get 72.98% and 27.02% - does not agree with the percentage separation, which I get.
@@ -1255,7 +1279,7 @@ second discriminant function as well. Therefore, to achieve a good separation of
 it is necessary to use both of the first two discriminant functions.
 
 We found above that the largest separation achieved for any of the individual variables (individual chemical concentrations)
-was 2.67 for V8, which is quite a lot less than 9.07, the separation achieved by the first discriminant function. Therefore,
+was 233.9 for V8, which is quite a lot less than 793.4, the separation achieved by the first discriminant function. Therefore,
 the effect of using more than one variable to calculate the discriminant function is that we can find a discriminant function
 that achieves a far greater separation between groups than achieved by any one variable alone.
 
@@ -1359,6 +1383,7 @@ and 4.114745 for cultivar 3. The mid-way point between the mean values for culti
 and the mid-way point between the mean values for cultivars 2 and 3 is (-0.4993242+4.114745)/2 = 1.807710.
 
 Therefore, we can use the following allocation rule:
+
 * if the first discriminant function is <= -2.057373, predict the sample to be from cultivar 1
 * if the first discriminant function is > -2.057373 and <= 1.807710, predict the sample to be from cultivar 2
 * if the first discriminant function is > 1.807710, predict the sample to be from cultivar 3
