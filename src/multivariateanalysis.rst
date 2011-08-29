@@ -634,7 +634,6 @@ For example, to calculate the within-groups covariance for variables V2 and V3, 
          variable2mean <- mean(variable2)
          # calculate the between-groups covariance
          Covb <- 0
-         #xxxtotallength <- nrow(variable1)
          for (i in 1:numlevels)
          {
             leveli <- levels[i]
@@ -643,13 +642,9 @@ For example, to calculate the within-groups covariance for variables V2 and V3, 
             mean1 <- mean(levelidata1)
             mean2 <- mean(levelidata2)
             levelilength <- length(levelidata1)
-            term1 <- ((mean1 - variable1mean)*(mean2 - variable2mean))
-            term2 <- (levelilength)
-            term3 <- term1 * (term2)
-            print(paste("group i=",i,"term1=",term1,"term2=",term2,"term3=",term3,"levelilength=",levelilength))
-            Covb <- Covb + term3  
+            term1 <- (mean1 - variable1mean)*(mean2 - variable2mean)*(levelilength)
+            Covb <- Covb + term1  
          }
-         #xxxtotallength <- nrow(variable1)
          Covb <- Covb / (numlevels - 1)
          return(Covb)
       }
