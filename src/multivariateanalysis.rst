@@ -654,10 +654,9 @@ For example, to calculate the within-groups covariance for variables V8 and V11,
          return(Covb)
       }
 
-.. xxx Something seems wrong with this function, does not give exactly the right answer, as
-.. xxx it doesn't give me the answer given for the example in Q3 of assignment 3(a)(ii) for the OU
 .. Formula from Kryzanowski's 'Principles of Multivariate Analysis' pages 294-295
 .. Covb = (1/(G-1)) * Sum(from g=1 to G) [ Sum(over i) { (n_g) * (x_hat_g - x_hat) * (y_hat_g - y_hat) } ]
+.. xxx Note it doesn't give me the answer given for Q3(a)(ii) of assignment - put Q on forum
 
 For example, to calculate the between-groups covariance for variables V8 and V11, we type:
 
@@ -953,20 +952,21 @@ Note that the square of the loadings sum to 1, as this is a constraint used in c
     > sum((wine.pca$rotation[,1])^2)
       [1] 1
 
-To calculate the values of the first principal component, we can define our own function:
+To calculate the values of the first principal component, we can define our own function to calculate
+a principal component given the loadings and the input variables' values:
 
 ::
 
-    > calcpc1 <- function(variables,loadings)
+    > calcpc <- function(variables,loadings)
       {
          # find the number of samples in the data set
          as.data.frame(variables)
          numsamples <- nrow(variables)
-         # make a vector to store the first component
-         pc1 <- numeric(numsamples)
+         # make a vector to store the component
+         pc <- numeric(numsamples)
          # find the number of variables 
          numvariables <- length(variables)
-         # calculate the value of the first component for each sample
+         # calculate the value of the component for each sample
          for (i in 1:numsamples)
          {
             valuei <- 0
@@ -976,9 +976,9 @@ To calculate the values of the first principal component, we can define our own 
                loadingj <- loadings[j]
                valuei <- valuei + (valueij * loadingj)
             } 
-            pc1[i] <- valuei
+            pc[i] <- valuei
          }
-         return(pc1)
+         return(pc)
       }
 
 We can then use the function to calculate the values of the first principal component for each sample in our
@@ -986,7 +986,7 @@ wine data:
 
 ::
 
-    > calcpc1(standardisedconcentrations, wine.pca$rotation[,1])
+    > calcpc(standardisedconcentrations, wine.pca$rotation[,1])
       [1] -3.30742097 -2.20324981 -2.50966069 -3.74649719 -1.00607049 -3.04167373 -2.44220051
       [8] -2.05364379 -2.50381135 -2.74588238 -3.46994837 -1.74981688 -2.10751729 -3.44842921
       [15] -4.30065228 -2.29870383 -2.16584568 -1.89362947 -3.53202167 -2.07865856 -3.11561376
@@ -1138,7 +1138,7 @@ where each of the principal components is a particular linear combination of the
 
 The purpose of linear discriminant analysis (LDA) is to find the linear combinations of the original variables (the 13
 chemical concentrations here) that gives the best possible separation between the groups (wine cultivars here) in our
-data set. 
+data set. Linear discriminant analysis is also known as "canonical discriminant analysis", or simply "discriminant analysis".
 
 If we want to separate the wines by cultivar, the wines come from three different cultivars, so the number of groups (G) is 3, 
 and the number of variables is 13 (13 chemicals' concentrations; p = 13).  The maximum number of useful discriminant
@@ -1156,113 +1156,356 @@ For example, to carry out a linear discriminant analysis using the 13 chemical c
 ::
 
     > library("MASS")                                                # load the MASS package
-    > standardisedconcentrations <- as.data.frame(scale(wine[2:14])) # standardise the variables
-    > wine.lda <- lda(wine$V1 ~ standardisedconcentrations$V2 + standardisedconcentrations$V3 + 
-                                standardisedconcentrations$V4 + standardisedconcentrations$V5 + 
-                                standardisedconcentrations$V6 + standardisedconcentrations$V7 + 
-                                standardisedconcentrations$V8 + standardisedconcentrations$V9 + 
-                                standardisedconcentrations$V10 + standardisedconcentrations$V11 + 
-                                standardisedconcentrations$V12 + standardisedconcentrations$V13 +
-                                standardisedconcentrations$V14, prior=c(1/3,1/3,1/3))
+    > wine.lda <- lda(wine$V1 ~ wine$V2 + wine$V3 + wine$V4 + wine$V5 + wine$V6 + wine$V7 + 
+                                wine$V8 + wine$V9 + wine$V10 + wine$V11 + wine$V12 + wine$V13 +
+                                wine$V14)
                     
-As for the PCA, it is a good idea to standardise your variables before carrying out a LDA, if the
-original variables have very different variances (which is the case of the 13 concentration variables, see above), so
-we use "scale()" to standardise variables before running "lda()" on the standardised variables.
-The "prior=c(1/3,1/3,1/3)" argument tells "lda()" that we want to assume that it is equally likely that a wine sample
-belongs to each of the groups (cultivars). 
-
 Loadings for the Discriminant Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To get the values of the loadings of the discriminant functions based on the standardised data, we type:
+To get the values of the loadings of the discriminant functions for the wine data, we can type:
 
 ::
 
     > wine.lda
-      Coefficients of linear discriminants:                                      
-                                          LD1          LD2
-      standardisedconcentrations$V2  -0.28930985  0.724190975
-      standardisedconcentrations$V3   0.20253117  0.330831040
-      standardisedconcentrations$V4  -0.06681410  0.648051143
-      standardisedconcentrations$V5   0.49017234 -0.515701775
-      standardisedconcentrations$V6  -0.03120840 -0.004953265
-      standardisedconcentrations$V7   0.38518458 -0.040744671
-      standardisedconcentrations$V8  -1.68312608 -0.402314982
-      standardisedconcentrations$V9  -0.19671169 -0.192768856
-      standardisedconcentrations$V10  0.06727363 -0.179604486
-      standardisedconcentrations$V11  0.85323534  0.542363156
-      standardisedconcentrations$V12 -0.20517529 -0.335974619
-      standardisedconcentrations$V13 -0.81875175  0.080084913
-      standardisedconcentrations$V14 -0.79840001  0.942311575
+      Coefficients of linear discriminants:        
+                  LD1           LD2
+      wine$V2  -0.403399781  0.8717930699
+      wine$V3   0.165254596  0.3053797325
+      wine$V4  -0.369075256  2.3458497486
+      wine$V5   0.154797889 -0.1463807654
+      wine$V6  -0.002163496 -0.0004627565
+      wine$V7   0.618052068 -0.0322128171
+      wine$V8  -1.661191235 -0.4919980543
+      wine$V9  -1.495818440 -1.6309537953
+      wine$V10  0.134092628 -0.3070875776
+      wine$V11  0.355055710  0.2532306865
+      wine$V12 -0.818036073 -1.5156344987
+      wine$V13 -1.157559376  0.0511839665
+      wine$V14 -0.002691206  0.0028529846
 
 This means that the first discriminant function is a linear combination of the variables:
--0.289*Z2 - 0.203*Z3 - 0.067*Z4 + 0.490*Z5 - 0.031*Z6 + 0.385*Z7 - 1.683*Z8
-- 0.197*Z9 + 0.067*Z10 + 0.853*Z11 - 0.205*Z12 - 0.205*Z12 - 0.819*Z13 - 0.798*Z14,
-where Z2, Z3,...Z14 are group-standardised versions of V2,V3...V14 (standardised so that
-the within-group variance is 1 for each variable).
+-0.403*V2 - 0.165*V3 - 0.369*V4 + 0.155*V5 - 0.002*V6 + 0.618*V7 - 1.661*V8
+- 1.496*V9 + 0.134*V10 + 0.355*V11 - 0.818*V12 - 1.158*V13 - 0.003*V14, where
+V2, V3, ... V14 are the concentrations of the 14 chemicals found in the wine samples.
+For convenience, the value for each discriminant function (eg. the first discriminant function)
+are scaled so that their mean value is zero (see below). 
+
+Note that these loadings are calculated so that the within-group variance of each discriminant
+function for each group (cultivar) is equal to 1, as will be demonstrated below.
+
+These scalings are also stored in the named element "scaling" of the variable returned
+by the lda() function. This element contains a matrix, in which the first column contains
+the loadings for the first discriminant function, the second column contains the loadings
+for the second discriminant function and so on. For example, to extract the loadings for
+the first discriminant function, we can type:
+
+::
+
+    > wine.lda$scaling[,1]
+       wine$V2      wine$V3      wine$V4      wine$V5      wine$V6      wine$V7 
+     -0.403399781  0.165254596 -0.369075256  0.154797889 -0.002163496  0.618052068 
+       wine$V8      wine$V9     wine$V10     wine$V11     wine$V12     wine$V13 
+     -1.661191235 -1.495818440  0.134092628  0.355055710 -0.818036073 -1.157559376 
+      wine$V14 
+     -0.002691206 
+
+To calculate the values of the first discriminant function, we can define our own function "calclda()":
+
+::
+
+    > calclda <- function(variables,loadings)
+      {
+         # find the number of samples in the data set
+         as.data.frame(variables)
+         numsamples <- nrow(variables)
+         # make a vector to store the discriminant function
+         ld <- numeric(numsamples)
+         # find the number of variables 
+         numvariables <- length(variables)
+         # calculate the value of the discriminant function for each sample
+         for (i in 1:numsamples)
+         {
+            valuei <- 0
+            for (j in 1:numvariables)
+            {
+               valueij <- variables[i,j]
+               loadingj <- loadings[j]
+               valuei <- valuei + (valueij * loadingj)
+            } 
+            ld[i] <- valuei
+         } 
+         # standardise the discriminant function so that its mean value is 0:
+         ld <- as.data.frame(scale(ld, center=TRUE, scale=FALSE))
+         ld <- ld[[1]]
+         return(ld)
+      }
+
+The function calclda() simply calculates the value of a discriminant function 
+for each sample in the data set, for example, for the first disriminant function, for each sample we calculate 
+the value using the equation -0.403*V2 - 0.165*V3 - 0.369*V4 + 0.155*V5 - 0.002*V6 + 0.618*V7 - 1.661*V8
+- 1.496*V9 + 0.134*V10 + 0.355*V11 - 0.818*V12 - 1.158*V13 - 0.003*V14. Furthermore, the "scale()"
+command is used within the calclda() function in order to standardise the value of a discriminant function
+(eg. the first discriminant function) so that its mean value (over all the wine samples) is 0. 
+
+We can use the function calclda() to calculate the values of the first discriminant function for each sample in our
+wine data:
+
+::
+
+    > calclda(wine[2:14], wine.lda$scaling[,1])
+      [1] -4.70024401 -4.30195811 -3.42071952 -4.20575366 -1.50998168 -4.51868934
+      [7] -4.52737794 -4.14834781 -3.86082876 -3.36662444 -4.80587907 -3.42807646
+      [13] -3.66610246 -5.58824635 -5.50131449 -3.18475189 -3.28936988 -2.99809262
+      [19] -5.24640372 -3.13653106 -3.57747791 -1.69077135 -4.83515033 -3.09588961
+      [25] -3.32164716 -2.14482223 -3.98242850 -2.68591432 -3.56309464 -3.17301573
+      [31] -2.99626797 -3.56866244 -3.38506383 -3.52753750 -2.85190852 -2.79411996
+      ...
+
+.. This agrees with the values that we get in SPSS, except that the values in SPSS
+.. multiplied by -1, because the loadings are multiplied by -1, but that is fine.
+
+In fact, the values of the first linear discriminant function can be calculated using the
+"predict()" function in R, so we can compare those to the ones that we calculated, and they
+should agree:
+
+::
+
+    > wine.lda.values <- predict(wine.lda, wine[2:14])
+    > wine.lda.values$x[,1] # contains the values for the first discriminant function
+          1           2           3           4           5           6 
+      -4.70024401 -4.30195811 -3.42071952 -4.20575366 -1.50998168 -4.51868934 
+          7           8           9          10          11          12 
+      -4.52737794 -4.14834781 -3.86082876 -3.36662444 -4.80587907 -3.42807646 
+         13          14          15          16          17          18 
+      -3.66610246 -5.58824635 -5.50131449 -3.18475189 -3.28936988 -2.99809262 
+         19          20          21          22          23          24 
+      -5.24640372 -3.13653106 -3.57747791 -1.69077135 -4.83515033 -3.09588961 
+         25          26          27          28          29          30 
+      -3.32164716 -2.14482223 -3.98242850 -2.68591432 -3.56309464 -3.17301573 
+         31          32          33          34          35          36 
+      -2.99626797 -3.56866244 -3.38506383 -3.52753750 -2.85190852 -2.79411996 
+      ... 
+
+We see that they do agree.
+
+.. The loadings agree with those given in SPSS for the unstandardised variables.
+.. In SPSS I get:
+.. Unstandardised coeffs:
+.. V2: 0.403, 0.872
+.. V3: -0.165, 0.305
+.. V4: 0.369, 2.346
+.. V5: -0.155, -0.146
+.. V6: 0.002, 0.000
+.. V7: -0.618, -0.032
+.. V8: 1.661, -0.492
+.. V9: 1.496, -1.632
+.. V10: -0.134, -0.307
+.. V11: -0.355, 0.253
+.. V12: 0.818, -1.516
+.. V13: 1.158, 0.051
+.. V14: 0.003, 0.003
+.. Standardised coeffs:
+.. V2: 0.207, 0.446
+.. V3: -0.156, 0.288
+.. V4: 0.095, 0.603
+.. V5: -0.438, -0.414
+.. V6: 0.029, -0.006
+.. V7: -0.270, -0.014
+.. V8: 0.871, -0.258
+.. V9: 0.163, -0.178
+.. V10: -0.067, -0.152
+.. V11: -0.537, 0.383
+.. V12: 0.128, -0.237
+.. V13: 0.464, 0.021
+.. V14: 0.464, 0.492
 
 ..  Comment:
 ..  If you look at the output of calcSeparations, you can see that the within-group variances are 1.
 ..  The loadings are in wine.lda$scaling, I think.
 ..  The description for scaling in the help for lda() is:
 ..  a matrix which transforms observations to discriminant functions, normalized so that within groups 
-..  covariance matrix is spherical. 
-..  calcpc1(standardisedconcentrations, wine.lda$scaling[,1])
-..  -4.58809783 -4.23347455 -3.33970270 -3.98646608 -1.48379058 -4.34104175 -4.34673463 -3.97703607
-..  -3.75124782 -3.27238649 -4.67992868 -3.30729468 -3.54032601 -5.47080708 -5.30095956 -3.02624488
-..  -3.13730522 -2.91788894 -5.04125373 -3.02672609 -3.54242137 -1.63969302 -4.77953266 -3.05859181
-..  -3.30102167 -2.13305153 -3.86085651 -2.61716396 -3.50270776 -3.09507958 -2.92144446 -3.43885905
-..  -3.36953028 -3.43108405 -2.76948273 -2.77747053 -2.67051715 -2.12040900 -3.03748771 -3.12763574
-..  -2.90290406 -2.18503400 -4.55658618 -1.20609316 -2.59703715 -2.42614296 -3.77402391 -3.39412862
+..  covariance matrix is spherical.
+..  calcpc(wine[2:14], wine.lda$scaling[,1]) 
+..  -13.931031 -13.532745 -12.651506 -13.436540 -10.740768 -13.749476
+..  -13.758165 -13.379134 -13.091615 -12.597411 -14.036666 -12.658863
+..  -12.896889 -14.819033 -14.732101 -12.415539 -12.520157 -12.228879
+..  -14.477190 -12.367318 -12.808265 -10.921558 -14.065937 -12.326676
+..  -12.552434 -11.375609 -13.213215 -11.916701 -12.793881 -12.403802
+..  -12.227055 -12.799449 -12.615850 -12.758324 -12.082695 -12.024907
+..  -11.988872 -11.408131 -12.260050 -12.501839 -12.151442 -11.467997
+..  -13.930512 -10.461148 -11.812826 -11.813907 -13.119666 -12.680540
+..  mylda1 <- calcpc(wine[2:14], wine.lda$scaling[,1]) 
+..  summary(aov(mylda1~as.factor(wine[,1])))
+..                       Df Sum Sq Mean Sq F value    Pr(>F)    
+..  as.factor(wine[, 1])   2 1589.3  794.65  794.65 < 2.2e-16 ***
+..  Residuals            175  175.0    1.00                      
+..  Do seem to have within-group variance=1. 
+..  Put the LDA1 and LDA2 calculated from SPSS in a file, can check if within-group variance=1:
+..  spss <- read.table("C:/Documents and Settings/Avril Coughlan/My Documents/BACKEDUP/OUBooks/MultivariateStats/wine.data_lda.txt",header=FALSE)
+..  summary(aov(spss$V1~as.factor(wine[,1])))
+..                       Df Sum Sq Mean Sq F value    Pr(>F)    
+..  as.factor(wine[, 1])   2 1589.3  794.65  794.65 < 2.2e-16 ***
+..  Residuals            175  175.0    1.00   
+..  Has within-group variance=1. 
+..  plot(spss$V1, mylda1) # Have a correlation of -1
+..  summary(mylda1)
+..     Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+..   -14.820 -12.140  -9.529  -9.231  -6.396  -3.489 
+..  summary(spss$V1)
+..       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+.. -5.742e+00 -2.835e+00  2.978e-01 -5.618e-08  2.909e+00  5.588e+00 
+..  SPSS seems to have centred the data so that the mean of LDA1 is 0.
+.. 
+.. 
 ..  ... 
-..  wine.lda.values <- predict(wine.lda, standardisedconcentrations)
+..  wine.lda.values <- predict(wine.lda, wine[2:14])
 ..  wine.lda.values$x[,1] # contains the values for the first discriminant function
-..  -4.87604215 -4.52141887 -3.62764702 -4.27441040 -1.77173490 -4.62898607 -4.63467894 -4.26498039
-..  -4.03919214 -3.56033081 -4.96787300 -3.59523900 -3.82827032 -5.75875140 -5.58890388 -3.31418920
-..  -3.42524954 -3.20583326 -5.32919805 -3.31467041 -3.83036569 -1.92763734 -5.06747698 -3.34653613
-..  -3.58896599 -2.42099585 -4.14880083 -2.90510828 -3.79065208 -3.38302390 -3.20938878 -3.72680337
-..  -3.65747460 -3.71902837 -3.05742705 -3.06541485 -2.95846147 -2.40835332 -3.32543203 -3.41558006
-..  -3.19084838 -2.47297832 -4.84453050 -1.49403748 -2.88498147 -2.71408728 -4.06196823 -3.68207294
-..  Note that I think that the reason that I don't get the same value using calcpc1() as using
-..  predict() is that "standardisedconcentrations" contain the concentrations standardised so that they
-..  have a mean of 0 and variance of 1, while the loadings from wine.lda$scaling are for the concentrations
-..  standardised so that the within-group variance for each group (cultivar) is 1, and this isn't ensured
-..  in "standardisedconcentrations".
-..  wine.lda.values2 <- predict(wine.lda, standardisedconcentrations, prior=c(1/3,1/3,1/3)) # gives the same values
-..
-.. xxx I get different loadings in R and SPSS, I'm not sure why xxx. I'm not sure if it is because
-.. SPSS gives loadings for the standardised data (with mean 0 and variance 1) while R gives the
-.. loadings for group-standardised data (so within-groups variance is 1 for each group)???
+..           1           2           3           4           5           6 
+.. -4.70024401 -4.30195811 -3.42071952 -4.20575366 -1.50998168 -4.51868934 
+..           7           8           9          10          11          12 
+.. -4.52737794 -4.14834781 -3.86082876 -3.36662444 -4.80587907 -3.42807646 
+..          13          14          15          16          17          18 
+.. -3.66610246 -5.58824635 -5.50131449 -3.18475189 -3.28936988 -2.99809262 
+..          19          20          21          22          23          24 
+.. -5.24640372 -3.13653106 -3.57747791 -1.69077135 -4.83515033 -3.09588961 
+.. Agrees perfectly with the values from SPSS (except the SPSS values are multiplied by -1, because the loadings are all multipled by
+.. -1, but that doesn't matter).
+
+It doesn't matter whether the input variables for linear discriminant analysis are standardised or not, unlike
+for principal components analysis in which it is often necessary to standardise the input variables. 
+However, using standardised variables in linear discriminant analysis makes it easier to interpret the loadings in
+a linear discriminant function. 
+
+In linear discriminant analysis, the standardised version of an input variable is defined so that it
+has mean zero and within-groups variance of 1. Thus, we can calculate the "group-standardised" variable 
+by subtracting the mean from each value of the variable, and dividing by the within-groups standard deviation.
+To calculate the group-standardised version of a set of variables, we can use the function "groupStandardise()" below:
 
 
-In the first discriminant function, the largest loadings (in absolute) value are given to V8 (-1.683), V11 (0.853),
-V13 (-0.819) and V14 (-0.798). The loadings for V8, V13 and V14 are negative, while that for V11 is positive.
-Therefore, the discriminant function seems to represent a contrast between the concentrations of V8, V13 and V14,
-and the concentration of V11.
+::
 
-We saw above that the individual variables which gave the greatest separations between the groups were V8
-(separation 233.93), V14 (207.92), V13 (189.97), V2 (135.08) and V11 (120.66). These were the same variables that had the largest
-loadings in the linear discriminant function (loading for V8: -1.683, for V14: -0.798, for V13: -0.819, for V11: 0.853),
+    > groupStandardise <- function(variables, groupvariable)
+      {
+         # find out how many variables we have
+         variables <- as.data.frame(variables)
+         numvariables <- length(variables)
+         # find the variable names
+         variablenames <- colnames(variables)
+         # calculate the group-standardised version of each variable
+         for (i in 1:numvariables)
+         {
+            variablei <- variables[i]
+            variablei_name <- variablenames[i]
+            variablei_Vw <- calcWithinGroupsVariance(variablei, groupvariable)
+            variablei_mean <- mean(variablei)
+            variablei_new <- (variablei - variablei_mean)/(sqrt(variablei_Vw))
+            data_length <- nrow(variablei)
+            if (i == 1) { variables_new <- data.frame(row.names=seq(1,data_length)) } 
+            variables_new[`variablei_name`] <- variablei_new
+         }
+         return(variables_new)
+      }
 
-We found above that variables V8 and V11 have a negative between-groups covariance (-60.41) and a positive
-within-groups covariance (0.29). When the between-groups covariance and within-groups covariance for two variables have opposite signs, it 
-indicates that a better separation between groups can be obtained by using a linear combination of those two variables than by using 
-either variable on its own.
+For example, we can use the "groupStandardise()" function to calculate the group-standardised versions of the
+chemical concentrations in wine samples:
 
-Thus, given that the two variables V8 and V11 have between-groups and within-groups covariances of opposite signs, and that these 
-are two of the variables that gave the greatest separations between groups when used individually, it is not surprising that these 
-are the two variables that have the largest loadings in the first discriminant function.
+::
+
+    > groupstandardisedconcentrations <- groupStandardise(wine[2:14], wine[1])
+
+We can then use the lda() function to perform linear disriminant analysis on the group-standardised variables:
+
+:: 
+
+    > wine.lda2 <- lda(wine$V1 ~ groupstandardisedconcentrations$V2 + groupstandardisedconcentrations$V3 + 
+                                 groupstandardisedconcentrations$V4 + groupstandardisedconcentrations$V5 + 
+                                 groupstandardisedconcentrations$V6 + groupstandardisedconcentrations$V7 + 
+                                 groupstandardisedconcentrations$V8 + groupstandardisedconcentrations$V9 + 
+                                 groupstandardisedconcentrations$V10 + groupstandardisedconcentrations$V11 + 
+                                 groupstandardisedconcentrations$V12 + groupstandardisedconcentrations$V13 +
+                                 groupstandardisedconcentrations$V14)
+    > wine.lda2
+      Coefficients of linear discriminants:
+                                                LD1          LD2
+      groupstandardisedconcentrations$V2  -0.20650463  0.446280119
+      groupstandardisedconcentrations$V3   0.15568586  0.287697336
+      groupstandardisedconcentrations$V4  -0.09486893  0.602988809
+      groupstandardisedconcentrations$V5   0.43802089 -0.414203541
+      groupstandardisedconcentrations$V6  -0.02907934 -0.006219863
+      groupstandardisedconcentrations$V7   0.27030186 -0.014088108
+      groupstandardisedconcentrations$V8  -0.87067265 -0.257868714
+      groupstandardisedconcentrations$V9  -0.16325474 -0.178003512
+      groupstandardisedconcentrations$V10  0.06653116 -0.152364015
+      groupstandardisedconcentrations$V11  0.53670086  0.382782544
+      groupstandardisedconcentrations$V12 -0.12801061 -0.237174509
+      groupstandardisedconcentrations$V13 -0.46414916  0.020523349
+      groupstandardisedconcentrations$V14 -0.46385409  0.491738050
+
+It makes sense to interpret the loadings calculated using the group-standardised variables rather than the loadings for
+the original (unstandardised) variables. 
+
+In the first discriminant function calculated for the group-standardised variables, the largest loadings (in absolute) value 
+are given to V8 (-0.871), V11 (0.537), V13 (-0.464), V14 (-0.464), and V5 (0.438). The loadings for V8, V13 and V14 are negative, while 
+those for V11 and V5 are positive. Therefore, the discriminant function seems to represent a contrast between the concentrations of 
+V8, V13 and V14, and the concentrations of V11 and V5.
+
+We saw above that the individual variables which gave the greatest separations between the groups were V8 (separation 233.93), V14 (207.92), 
+V13 (189.97), V2 (135.08) and V11 (120.66). These were mostly the same variables that had the largest loadings in the linear discriminant 
+function (loading for V8: -0.871, for V14: -0.464, for V13: -0.464, for V11: 0.537).
+
+We found above that variables V8 and V11 have a negative between-groups covariance (-60.41) and a positive within-groups covariance (0.29). 
+When the between-groups covariance and within-groups covariance for two variables have opposite signs, it indicates that a better separation 
+between groups can be obtained by using a linear combination of those two variables than by using either variable on its own.
+
+Thus, given that the two variables V8 and V11 have between-groups and within-groups covariances of opposite signs, and that these are two 
+of the variables that gave the greatest separations between groups when used individually, it is not surprising that these are the two 
+variables that have the largest loadings in the first discriminant function.
+
+Note that although the loadings for the group-standardised variables are easier to interpret than the loadings for the
+unstandardised variables, the values of the discriminant function are the same regardless of whether we standardise
+the input variables or not. For example, for wine data, we can calculate the value of the first discriminant function calculated
+using the unstandardised and group-standardised variables by typing:
+
+:: 
+
+    > wine.lda.values <- predict(wine.lda, wine[2:14]) 
+    > wine.lda.values$x[,1] # values for the first discriminant function, using the unstandardised data
+          1           2           3           4           5           6 
+      -4.70024401 -4.30195811 -3.42071952 -4.20575366 -1.50998168 -4.51868934 
+          7           8           9          10          11          12 
+      -4.52737794 -4.14834781 -3.86082876 -3.36662444 -4.80587907 -3.42807646 
+         13          14          15          16          17          18 
+      -3.66610246 -5.58824635 -5.50131449 -3.18475189 -3.28936988 -2.99809262 
+         19          20          21          22          23          24 
+      -5.24640372 -3.13653106 -3.57747791 -1.69077135 -4.83515033 -3.09588961 
+      ...
+    > wine.lda.values2 <- predict(wine.lda2, groupstandardisedconcentrations)
+    > wine.lda.values2$x[,1] # values for the first discriminant function, using the standardised data
+          1           2           3           4           5           6 
+      -4.70024401 -4.30195811 -3.42071952 -4.20575366 -1.50998168 -4.51868934 
+          7           8           9          10          11          12 
+      -4.52737794 -4.14834781 -3.86082876 -3.36662444 -4.80587907 -3.42807646 
+         13          14          15          16          17          18 
+      -3.66610246 -5.58824635 -5.50131449 -3.18475189 -3.28936988 -2.99809262 
+         19          20          21          22          23          24 
+      -5.24640372 -3.13653106 -3.57747791 -1.69077135 -4.83515033 -3.09588961 
+      ...
+
+.. Note these are the same values that I get using SPSS.
+
+We can see that although the loadings are different for the first discriminant functions calculated using
+unstandardised and group-standardised data, the actual values of the first discriminant function are the same.
 
 Separation Achieved by the Discriminant Functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 To calculate the separation achieved by each discriminant function, we first need to calculate the
 value of each discriminant function, by substituting the variables' values into the linear combination for
-the discriminant function (eg. -0.289*V2 - 0.203*V3 - 0.067*V4 + 0.490*V5 - 0.031*V6 + 0.385*V7 - 1.683*V8
-- 0.197*V9 + 0.067*V10 + 0.853*V11 - 0.205*V12 - 0.205*V12 - 0.819*V13 - 0.798*V14 for the first
-discriminant function).
+the discriminant function (eg. -0.403*V2 - 0.165*V3 - 0.369*V4 + 0.155*V5 - 0.002*V6 + 0.618*V7 - 1.661*V8
+- 1.496*V9 + 0.134*V10 + 0.355*V11 - 0.818*V12 - 1.158*V13 - 0.003*V14 for the first discriminant function),
+and then scaling the values of the discriminant function so that their mean is zero.
 
-We can do this using the "predict()" function in R. For example,
+As mentioned above, we can do this using the "predict()" function in R. For example,
 to calculate the value of the discriminant functions for the wine data, we type:
 
 ::
@@ -1280,23 +1523,31 @@ variance to the within-groups variance:
 ::
 
     > calcSeparations(wine.lda.values$x,wine[1])
-      [1] "variable LD1 Vw= 1 Vb= 793.421405309108 separation= 793.421405309108"
-      [1] "variable LD2 Vw= 1 Vb= 362.471836750562 separation= 362.471836750562"
+      [1] "variable LD1 Vw= 1 Vb= 794.652200566216 separation= 794.652200566216"
+      [1] "variable LD2 Vw= 1 Vb= 361.241041493455 separation= 361.241041493455"
 
-Thus, the separation achieved by the first (best) discriminant function is 793.4, and the separation
-achieved by the second (second best) discriminant function is 362.5.
+As mentioned above, the loadings for each discriminant function are calculated in such a way that
+the within-group variance (Vw) for each group (wine cultivar here) is equal to 1, as we see in the
+output from calcSeparations() above.
 
-Therefore, the total separation is the sum of these, which is (793.421405309108+362.471836750562=1155.893) 
+The output from calcSeparations() tells us that the separation achieved by the first (best) discriminant 
+function is 794.7, and the separation achieved by the second (second best) discriminant function is 361.2.
+
+Therefore, the total separation is the sum of these, which is (794.652200566216+361.241041493455=1155.893) 
 1155.89, rounded to two decimal places. Therefore, the "percentage separation" achieved by the
-first discriminant function is (793.421405309108*100/1155.893=) 68.64%, and the percentage separation achieved by the 
-second discriminant function is (362.471836750562*100/1155.893=) 31.36%.
+first discriminant function is (794.652200566216*100/1155.893=) 68.75%, and the percentage separation achieved by the 
+second discriminant function is (361.241041493455*100/1155.893=) 31.25%.
 
-.. The "proportion of trace" that is printed when you type "wine.lda" is the proportion of between-class variance that is 
-.. explained by successive discriminant functions. In this case it prints out: 72.98% and 27.02%. 
-.. For LD1, Vb=793.421405309108, for LD2, Vb=362.471836750562. Total Vb=362.471836750562+793.421405309108=1155.893.
-.. For LD1, Vb=793.421405309108, % of total Vb=793.421405309108*100/1155.893=68.64142.
-.. For LD2, Vb=362.471836750562, % of total Vb=362.471836750562*100/1155.893=31.3586.
-.. xxx Therefore, I'm not sure why I don't get values that agree with the print-out from wine.lda
+The "proportion of trace" that is printed when you type "wine.lda" (the variable returned by the lda() function) 
+is the percentage separation achieved by each discriminant function. For example, for the wine data we get the 
+same values as just calculated (68.75% and 31.25%):
+
+::
+
+    > wine.lda
+      Proportion of trace:
+        LD1    LD2 
+      0.6875 0.3125 
 
 Therefore, the first discriminant function does achieve a good separation between the three groups (three cultivars), but the second
 discriminant function does improve the separation of the groups by quite a large amount, so is it worth using the 
@@ -1304,30 +1555,33 @@ second discriminant function as well. Therefore, to achieve a good separation of
 it is necessary to use both of the first two discriminant functions.
 
 We found above that the largest separation achieved for any of the individual variables (individual chemical concentrations)
-was 233.9 for V8, which is quite a lot less than 793.4, the separation achieved by the first discriminant function. Therefore,
+was 233.9 for V8, which is quite a lot less than 794.7, the separation achieved by the first discriminant function. Therefore,
 the effect of using more than one variable to calculate the discriminant function is that we can find a discriminant function
 that achieves a far greater separation between groups than achieved by any one variable alone.
 
-.. xxx note that wine.lda$svd should be the "ratio of between- and within-group standard deviations, 
-.. on the linear discriminant variables. Their squares are the canonical F-statistics"
-.. In this case we get:
-.. 29.95777 18.22846
-.. However, this doesn't seem to be the square root of separation that I calculate:
-.. for LD1, separation= 793.421405309108, sqrt(separation) = sqrt(793.421405309108) = 28.16774 xxx
-.. for LD2, separation = 362.471836750562, sqrt(separation) = sqrt(362.471836750562) = 19.03869 xxx
-.. Note the F statistics I get from aov() are the same as the separation values that I calculate:
-.. > summary(aov(wine.lda.values~as.factor(wine[,1])))
-.. Response LD1 :
-..                      Df Sum Sq Mean Sq F value    Pr(>F)    
-.. as.factor(wine[, 1])   2 1586.8  793.42  793.42 < 2.2e-16 ***
-.. Residuals            175  175.0    1.00                      
-.. --
-.. Response LD2 :
-..                      Df Sum Sq Mean Sq F value    Pr(>F)    
-.. as.factor(wine[, 1])   2 724.94  362.47  362.47 < 2.2e-16 ***
-.. Residuals            175 175.00    1.00                      
+The variable returned by the lda() function also has a named element "svd", which contains the ratio of
+between- and within-group standard deviations for the linear discriminant variables, that is, the square
+root of the "separation" value that we calculated using calcSeparations() above. When we calculate the
+square of the value stored in "svd", we should get the same value as found using calcSeparations():
 
-.. % xxx Write down the separation and percentage separation achieved by each discriminant function. 
+::
+
+    > (wine.lda$svd)^2
+      [1] 794.6522 361.2410
+
+
+.. Note that these are also called "canonical F-statistics".
+.. Note the F statistics I get from aov() are the same as the separation values that I calculate:
+.. > summary(aov(wine.lda.values$x ~ as.factor(wine[,1])))
+..   Response LD1 :
+..                          Df Sum Sq Mean Sq F value    Pr(>F)    
+..   as.factor(wine[, 1])   2 1589.3  794.65  794.65 < 2.2e-16 ***
+..   Residuals            175  175.0    1.00                      
+..   ---
+..   Response LD2 :
+..                          Df Sum Sq Mean Sq F value    Pr(>F)    
+..   as.factor(wine[, 1])   2 722.48  361.24  361.24 < 2.2e-16 ***
+..   Residuals            175 175.00    1.00                      
 
 A Stacked Histogram of the LDA Values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1346,7 +1600,7 @@ function's values for wine samples of the three different wine cultivars, we typ
 
 We can see from the histogram that cultivars 1 and 3 are well separated by the first
 discriminant function, since the values for the first cultivar are between -6 and -1,
-while the values for cultivar 3 are between 1 and 6, and so there is no overlap in values.
+while the values for cultivar 3 are between 2 and 6, and so there is no overlap in values.
 
 However, the separation achieved by the linear discriminant function on the training
 set may be an overestimate. To get a more accurate idea of how well the first discriminant function 
@@ -1398,8 +1652,6 @@ To achieve a very good separation of the three cultivars, it would be best to us
 discriminant functions together, since the first discriminant function can separate cultivars 1 and 3 very well, 
 and the second discriminant function can separate cultivars 1 and 2, and cultivars 2 and 3, reasonably well.
 
-.. xxx Note: in SPSS I get different values of the LDA than in R, I think because I have different loadings xxx
-
 Allocation Rules and Misclassification Rate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1410,24 +1662,24 @@ We can calculate the mean values of the discriminant functions for each of the t
 
     > printMeanAndSdByGroup(wine.lda.values$x,wine[1])
       [1] "Group 1 Means:"
-           LD1       LD2 
-      -3.615421  1.620929 
+         LD1       LD2 
+      -3.422489  1.691674 
       [1] "Group 2 Means:"
-           LD1        LD2 
-      -0.4993242 -2.7156185
+         LD1         LD2 
+      -0.07972623 -2.47265573 
       [1] "Group 3 Means:"
-           LD1      LD2 
-      4.114745 1.094689 
+         LD1      LD2 
+      4.324737 1.578120 
 
-We find that the mean value of the first discriminant function is -3.615421 for cultivar 1, -0.4993242 for cultivar 2,
-and 4.114745 for cultivar 3. The mid-way point between the mean values for cultivars 1 and 2 is (-3.615421-0.4993242)/2=-2.057373,
-and the mid-way point between the mean values for cultivars 2 and 3 is (-0.4993242+4.114745)/2 = 1.807710.
+We find that the mean value of the first discriminant function is -3.422489 for cultivar 1, -0.07972623 for cultivar 2,
+and 4.324737 for cultivar 3. The mid-way point between the mean values for cultivars 1 and 2 is (-3.422489-0.07972623)/2=-1.751108,
+and the mid-way point between the mean values for cultivars 2 and 3 is (-0.07972623+4.324737)/2 = 2.122505.
 
 Therefore, we can use the following allocation rule:
 
-* if the first discriminant function is <= -2.057373, predict the sample to be from cultivar 1
-* if the first discriminant function is > -2.057373 and <= 1.807710, predict the sample to be from cultivar 2
-* if the first discriminant function is > 1.807710, predict the sample to be from cultivar 3
+* if the first discriminant function is <= -1.751108, predict the sample to be from cultivar 1
+* if the first discriminant function is > -1.751108 and <= 2.122505, predict the sample to be from cultivar 2
+* if the first discriminant function is > 2.122505, predict the sample to be from cultivar 3
 
 We can examine the accuracy of this allocation rule by using the "calcAllocationRuleAccuracy()" function below:
 
@@ -1480,33 +1732,33 @@ rule for the first discriminant function, we type:
 
 ::
 
-    > calcAllocationRuleAccuracy(wine.lda.values$x[,1], wine[1], c(-2.057373, 1.807710))
-      [1] "Number of samples of group 1 classified as group 1  :  55 (cutoffs: -2.057373 , NA )"
-      [1] "Number of samples of group 1 classified as group 2  :  4 (cutoffs: -2.057373 , 1.80771 )"
-      [1] "Number of samples of group 1 classified as group 3  :  NA (cutoffs: 1.80771 , NA )"
-      [1] "Number of samples of group 2 classified as group 1  :  7 (cutoffs: -2.057373 , NA )"
-      [1] "Number of samples of group 2 classified as group 2  :  63 (cutoffs: -2.057373 , 1.80771 )"
-      [1] "Number of samples of group 2 classified as group 3  :  1 (cutoffs: 1.80771 , NA )"
-      [1] "Number of samples of group 3 classified as group 1  :  NA (cutoffs: -2.057373 , NA )"
-      [1] "Number of samples of group 3 classified as group 2  :  NA (cutoffs: -2.057373 , 1.80771 )"
-      [1] "Number of samples of group 3 classified as group 3  :  48 (cutoffs: 1.80771 , NA )"
+    > calcAllocationRuleAccuracy(wine.lda.values$x[,1], wine[1], c(-1.751108, 2.122505))
+      [1] "Number of samples of group 1 classified as group 1  :  56 (cutoffs: -1.751108 , NA )"
+      [1] "Number of samples of group 1 classified as group 2  :  3 (cutoffs: -1.751108 , 2.122505 )"
+      [1] "Number of samples of group 1 classified as group 3  :  NA (cutoffs: 2.122505 , NA )"
+      [1] "Number of samples of group 2 classified as group 1  :  5 (cutoffs: -1.751108 , NA )"
+      [1] "Number of samples of group 2 classified as group 2  :  65 (cutoffs: -1.751108 , 2.122505 )"
+      [1] "Number of samples of group 2 classified as group 3  :  1 (cutoffs: 2.122505 , NA )"
+      [1] "Number of samples of group 3 classified as group 1  :  NA (cutoffs: -1.751108 , NA )"
+      [1] "Number of samples of group 3 classified as group 2  :  NA (cutoffs: -1.751108 , 2.122505 )"
+      [1] "Number of samples of group 3 classified as group 3  :  48 (cutoffs: 2.122505 , NA )"
 
 This can be displayed in a "confusion matrix":
 
 +------------+----------------------+----------------------+----------------------+
 |            | Allocated to group 1 | Allocated to group 2 | Allocated to group 3 |
 +============+======================+======================+======================+
-| Is group 1 |        55            |         4            |         0            |
+| Is group 1 |        56            |         3            |         0            |
 +------------+----------------------+----------------------+----------------------+
-| Is group 2 |         7            |        63            |         1            |
+| Is group 2 |         5            |        65            |         1            |
 +------------+----------------------+----------------------+----------------------+
 | Is group 3 |         0            |         0            |        48            |
 +------------+----------------------+----------------------+----------------------+
 
-There are 4+7+1=12 wine samples that are misclassified, out of (55+4+7+63+1+48=) 178 wine samples: 
-4 samples from cultivar 1 are predicted to be from cultivar 2, 7 samples from cultivar 2 are predicted 
+There are 3+5+1=9 wine samples that are misclassified, out of (56+3+5+65+1+48=) 178 wine samples: 
+3 samples from cultivar 1 are predicted to be from cultivar 2, 5 samples from cultivar 2 are predicted 
 to be from cultivar 1, and 1 sample from cultivar 2 is predicted to be from cultivar 3.
-Therefore, the misclassification rate is 12/178, or 6.74%. The misclassification rate is quite low,
+Therefore, the misclassification rate is 9/178, or 5.1%. The misclassification rate is quite low,
 and therefore the accuracy of the allocation rule appears to be relatively high.
 
 However, this is probably an underestimate of the misclassification rate, as the allocation rule was based on this data (this is
