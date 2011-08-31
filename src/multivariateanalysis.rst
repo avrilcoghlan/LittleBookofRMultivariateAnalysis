@@ -4,7 +4,7 @@ Using R for Multivariate Analysis
 Multivariate Analysis
 ---------------------
 
-This booklet itells you how to use the R statistical software to carry out some simple multivariate analyses,
+This booklet tells you how to use the R statistical software to carry out some simple multivariate analyses,
 with a focus on principal components analysis (PCA) and linear discriminant analysis (LDA).
 
 This booklet assumes that the reader has some basic knowledge of multivariate analyses, and
