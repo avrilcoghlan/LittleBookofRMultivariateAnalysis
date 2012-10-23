@@ -267,17 +267,23 @@ wine samples. These are stored in columns 2-14 of the variable "wine". So we typ
       
 This tells us that the mean of variable V2 is 13.0006180, the mean of V3 is 2.3363483, and so on.
 
+.. sidebar:: sapply
+
+   The "sapply()" function can be used to apply some other function to each column
+   in a data frame, eg. sapply(mydataframe,sd) will calculate the standard deviation of 
+   each column in a dataframe "mydataframe".
+
 Similarly, to get the standard deviations of the 13 chemical concentrations, we type:
 
 ::
 
-    > sd(wine[2:14]) 
+    > sapply(wine[2:14],sd)
               V2          V3          V4          V5          V6          V7 
        0.8118265   1.1171461   0.2743440   3.3395638  14.2824835   0.6258510 
               V8          V9         V10         V11         V12         V13 
        0.9988587   0.1244533   0.5723589   2.3182859   0.2285716   0.7099904 
               V14 
-     314.9074743 
+       314.9074743 
 
 We can see here that it would make sense to standardise in order to compare the variables because the variables
 have very different standard deviations - the standard deviation of V14 is 314.9074743, while the standard deviation
@@ -307,7 +313,7 @@ just the cultivar 2 samples:
       12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845 
         V9        V10        V11        V12        V13        V14 
       0.363662   1.630282   3.086620   1.056282   2.785352 519.507042 
-    > sd(cultivar2wine[2:14]) 
+    > sapply(cultivar2wine[2:14]) 
         V2          V3          V4          V5          V6          V7          V8 
       0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008 
         V9         V10         V11         V12         V13         V14 
@@ -810,7 +816,7 @@ has a mean of 0 and a standard deviation of 1 by typing:
       6.958263e-17 -1.042186e-16 -1.221369e-16  3.649376e-17  2.093741e-16  3.003459e-16 
           V14 
       -1.034429e-16 
-    > sd(standardisedconcentrations)
+    > sapply(standardisedconcentrations,sd)
       V2  V3  V4  V5  V6  V7  V8  V9 V10 V11 V12 V13 V14 
       1   1   1   1   1   1   1   1   1   1   1   1   1 
 
@@ -1796,6 +1802,8 @@ available from `the Open University Shop <http://www.ouw.co.uk/store/>`_.
 I am grateful to the UCI Machine Learning Repository, 
 `http://archive.ics.uci.edu/ml <http://archive.ics.uci.edu/ml>`_, for making data sets available
 which I have used in the examples in this booklet.
+
+Thank you to the following users for very helpful comments: to Rich O'Hara for pointing out that sd(<data.frame>) is deprecated. 
 
 Contact
 -------
