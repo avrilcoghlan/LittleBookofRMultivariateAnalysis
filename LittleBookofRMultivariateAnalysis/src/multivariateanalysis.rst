@@ -267,13 +267,13 @@ wine samples. These are stored in columns 2-14 of the variable "wine". So we typ
       
 This tells us that the mean of variable V2 is 13.0006180, the mean of V3 is 2.3363483, and so on.
 
-Similarly, to get the standard deviations of the 13 chemical concentrations, we type:
-
 .. sidebar:: sapply
 
    The "sapply()" function can be used to apply some other function to each column
    in a data frame, eg. sapply(mydataframe,sd) will calculate the standard deviation of 
    each column in a dataframe "mydataframe".
+
+Similarly, to get the standard deviations of the 13 chemical concentrations, we type:
 
 ::
 
