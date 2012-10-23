@@ -313,7 +313,7 @@ just the cultivar 2 samples:
       12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845 
         V9        V10        V11        V12        V13        V14 
       0.363662   1.630282   3.086620   1.056282   2.785352 519.507042 
-    > sd(cultivar2wine[2:14]) 
+    > sapply(cultivar2wine[2:14]) 
         V2          V3          V4          V5          V6          V7          V8 
       0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008 
         V9         V10         V11         V12         V13         V14 
@@ -816,7 +816,7 @@ has a mean of 0 and a standard deviation of 1 by typing:
       6.958263e-17 -1.042186e-16 -1.221369e-16  3.649376e-17  2.093741e-16  3.003459e-16 
           V14 
       -1.034429e-16 
-    > sd(standardisedconcentrations)
+    > sapply(standardisedconcentrations,sd)
       V2  V3  V4  V5  V6  V7  V8  V9 V10 V11 V12 V13 V14 
       1   1   1   1   1   1   1   1   1   1   1   1   1 
 
