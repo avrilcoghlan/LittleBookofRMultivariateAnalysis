@@ -1803,6 +1803,8 @@ I am grateful to the UCI Machine Learning Repository,
 `http://archive.ics.uci.edu/ml <http://archive.ics.uci.edu/ml>`_, for making data sets available
 which I have used in the examples in this booklet.
 
+Thank you to the following users for very helpful comments: to Rich O'Hara for pointing out that sd(<data.frame>) is deprecated. 
+
 Contact
 -------
 
