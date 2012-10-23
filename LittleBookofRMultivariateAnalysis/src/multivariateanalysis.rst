@@ -283,7 +283,7 @@ Similarly, to get the standard deviations of the 13 chemical concentrations, we 
               V8          V9         V10         V11         V12         V13 
        0.9988587   0.1244533   0.5723589   2.3182859   0.2285716   0.7099904 
               V14 
-     314.9074743 
+       314.9074743 
 
 We can see here that it would make sense to standardise in order to compare the variables because the variables
 have very different standard deviations - the standard deviation of V14 is 314.9074743, while the standard deviation
