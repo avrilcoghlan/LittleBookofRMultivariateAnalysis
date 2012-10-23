@@ -267,12 +267,6 @@ wine samples. These are stored in columns 2-14 of the variable "wine". So we typ
       
 This tells us that the mean of variable V2 is 13.0006180, the mean of V3 is 2.3363483, and so on.
 
-.. sidebar:: sapply
-
-   The "sapply()" function can be used to apply some other function to each column
-   in a data frame, eg. sapply(mydataframe,sd) will calculate the standard deviation of 
-   each column in a dataframe "mydataframe".
-
 Similarly, to get the standard deviations of the 13 chemical concentrations, we type:
 
 ::
@@ -284,6 +278,12 @@ Similarly, to get the standard deviations of the 13 chemical concentrations, we 
        0.9988587   0.1244533   0.5723589   2.3182859   0.2285716   0.7099904 
               V14 
        314.9074743 
+
+.. sidebar:: sapply
+
+   The "sapply()" function can be used to apply some other function to each column
+   in a data frame, eg. sapply(mydataframe,sd) will calculate the standard deviation of 
+   each column in a dataframe "mydataframe".
 
 We can see here that it would make sense to standardise in order to compare the variables because the variables
 have very different standard deviations - the standard deviation of V14 is 314.9074743, while the standard deviation
