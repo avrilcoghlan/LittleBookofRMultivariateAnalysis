@@ -251,19 +251,25 @@ Calculating Summary Statistics for Multivariate Data
 Another thing that you are likely to want to do is to calculate summary statistics such as the
 mean and standard deviation for each of the variables in your multivariate data set.
 
+.. sidebar:: sapply
+
+   The "sapply()" function can be used to apply some other function to each column
+   in a data frame, eg. sapply(mydataframe,sd) will calculate the standard deviation of 
+   each column in a dataframe "mydataframe".
+
 This is easy to do, using the "mean()" and "sd()" functions in R. For example, say we want
 to calculate the mean and standard deviations of each of the 13 chemical concentrations in the
 wine samples. These are stored in columns 2-14 of the variable "wine". So we type:
 
 ::
 
-    > mean(wine[2:14]) 
+    > sapply(wine[2:14],mean)
               V2          V3          V4          V5          V6          V7 
       13.0006180   2.3363483   2.3665169  19.4949438  99.7415730   2.2951124 
               V8          V9         V10         V11         V12         V13 
        2.0292697   0.3618539   1.5908989   5.0580899   0.9574494   2.6116854 
               V14 
-     746.8932584 
+      746.8932584 
       
 This tells us that the mean of variable V2 is 13.0006180, the mean of V3 is 2.3363483, and so on.
 
@@ -278,12 +284,6 @@ Similarly, to get the standard deviations of the 13 chemical concentrations, we 
        0.9988587   0.1244533   0.5723589   2.3182859   0.2285716   0.7099904 
               V14 
        314.9074743 
-
-.. sidebar:: sapply
-
-   The "sapply()" function can be used to apply some other function to each column
-   in a data frame, eg. sapply(mydataframe,sd) will calculate the standard deviation of 
-   each column in a dataframe "mydataframe".
 
 We can see here that it would make sense to standardise in order to compare the variables because the variables
 have very different standard deviations - the standard deviation of V14 is 314.9074743, while the standard deviation
@@ -308,7 +308,7 @@ just the cultivar 2 samples:
 
 ::
 
-    > mean(cultivar2wine[2:14])
+    > sapply(cultivar2wine[2:14],mean)
         V2         V3         V4         V5         V6         V7         V8 
       12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845 
         V9        V10        V11        V12        V13        V14 
@@ -522,7 +522,7 @@ within-groups variance. Thus, the separation achieved by V2 is calculated as:
 .. as.factor(wine[, 1])   2 70.795  35.397  135.08 < 2.2e-16 ***
 .. Residuals            175 45.859   0.262                      
 .. ---
-.. Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+.. Signif. codes:  0 Â‘***Â’ 0.001 Â‘**Â’ 0.01 Â‘*Â’ 0.05 Â‘.Â’ 0.1 Â‘ Â’ 1 
 ..
 .. Here the within-groups variance is 0.262 (called the mean square of residuals)
 .. and the between-groups variance is 35.397. The ratio is 135.08 (the F statistic), which
@@ -809,7 +809,7 @@ has a mean of 0 and a standard deviation of 1 by typing:
 
 ::
 
-    > mean(standardisedconcentrations) 
+    > sapply(standardisedconcentrations,mean) 
            V2            V3            V4            V5            V6            V7 
       -8.591766e-16 -6.776446e-17  8.045176e-16 -7.720494e-17 -4.073935e-17 -1.395560e-17 
            V8            V9           V10           V11           V12           V13 
@@ -1191,7 +1191,7 @@ To get the values of the loadings of the discriminant functions for the wine dat
       wine$V14 -0.002691206  0.0028529846
 
 This means that the first discriminant function is a linear combination of the variables:
--0.403*V2 - 0.165*V3 - 0.369*V4 + 0.155*V5 - 0.002*V6 + 0.618*V7 - 1.661*V8
+-0.403*V2 + 0.165*V3 - 0.369*V4 + 0.155*V5 - 0.002*V6 + 0.618*V7 - 1.661*V8
 - 1.496*V9 + 0.134*V10 + 0.355*V11 - 0.818*V12 - 1.158*V13 - 0.003*V14, where
 V2, V3, ... V14 are the concentrations of the 14 chemicals found in the wine samples.
 For convenience, the value for each discriminant function (eg. the first discriminant function)
@@ -1803,7 +1803,9 @@ I am grateful to the UCI Machine Learning Repository,
 `http://archive.ics.uci.edu/ml <http://archive.ics.uci.edu/ml>`_, for making data sets available
 which I have used in the examples in this booklet.
 
-Thank you to the following users for very helpful comments: to Rich O'Hara for pointing out that sd(<data.frame>) is deprecated. 
+Thank you to the following users for very helpful comments: to Rich O'Hara and Patrick Hausmann for pointing 
+out that sd(<data.frame>) and mean(<data.frame>) is deprecated; to Arnau Serra-Cayuela for pointing out a typo
+in the LDA section.
 
 Contact
 -------
