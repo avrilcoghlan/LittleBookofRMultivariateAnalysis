@@ -329,20 +329,22 @@ prints out the mean and standard deviation of the variables for each group in yo
 
     > printMeanAndSdByGroup <- function(variables,groupvariable)
       {
+         # find the names of the variables
+         variablenames <- c(names(groupvariable),names(variables))
          # within each group, find the mean of each variable
          groupvariable <- groupvariable[,1] # ensures groupvariable is not a list
          means <- aggregate(as.matrix(variables) ~ groupvariable, FUN = mean)
-         names(means) <- c(names(variables),names(groupvariable))
+         names(means) <- variablenames                             
          print(paste("Means:"))
          print(means)
          # within each group, find the standard deviation of each variable:
          sds <- aggregate(as.matrix(variables) ~ groupvariable, FUN = sd)
-         names(sds) <- c(names(variables),names(groupvariable))
+         names(sds) <- variablenames                             
          print(paste("Standard deviations:"))
          print(sds)
          # within each group, find the number of samples:
          samplesizes <- aggregate(as.matrix(variables) ~ groupvariable, FUN = length)
-         names(samplesizes) <- c(names(variables),names(groupvariable))
+         names(samplesizes) <- variablenames 
          print(paste("Sample sizes:"))
          print(samplesizes)
       }
@@ -355,32 +357,22 @@ for each of the 13 chemical concentrations, for each of the three different wine
 ::
 
     > printMeanAndSdByGroup(wine[2:14],wine[1])
-      [1] "Group 1 Group size: 59"
-      [1] "Group 1 Means:"
-         V2          V3          V4          V5          V6          V7          V8 
-      13.744746    2.010678    2.455593   17.037288  106.338983    2.840169    2.982373 
-         V9         V10         V11         V12         V13         V14 
-      0.290000    1.899322    5.528305    1.062034    3.157797 1115.711864 
-      [1] "Group 1 Standard Deviations:"
-          V2           V3           V4           V5           V6           V7 
-      0.46212536   0.68854886   0.22716598   2.54632245  10.49894932   0.33896135 
-          V8           V9          V10          V11          V12          V13 
-      0.39749361   0.07004924   0.41210923   1.23857281   0.11648264   0.35707658 
-         V14 
-      221.52076659 
-      [1] "Group 2 Group size: 71"
-      [1] "Group 2 Means:"
-        V2         V3         V4         V5         V6         V7         V8 
-      12.278732   1.932676   2.244789  20.238028  94.549296   2.258873   2.080845 
-        V9        V10        V11        V12        V13        V14 
-      0.363662   1.630282   3.086620   1.056282   2.785352 519.507042 
-      [1] "Group 2 Standard Deviations:"
-         V2          V3          V4          V5          V6          V7          V8 
-      0.5379642   1.0155687   0.3154673   3.3497704  16.7534975   0.5453611   0.7057008 
-         V9         V10         V11         V12         V13         V14 
-      0.1239613   0.6020678   0.9249293   0.2029368   0.4965735 157.2112204 
-      [1] "Group 3 Group size: 48"
-      [1] "Group 3 Means:"
+      [1] "Means:"
+        V2       V3       V4       V5       V6       V7       V8        V9      V10      V11      V12       V13      V14        NA
+      1  1 13.74475 2.010678 2.455593 17.03729 106.3390 2.840169 2.9823729 0.290000 1.899322 5.528305 1.0620339 3.157797 1115.7119
+      2  2 12.27873 1.932676 2.244789 20.23803  94.5493 2.258873 2.0808451 0.363662 1.630282 3.086620 1.0562817 2.785352  519.5070
+      3  3 13.15375 3.333750 2.437083 21.41667  99.3125 1.678750 0.7814583 0.447500 1.153542 7.396250 0.6827083 1.683542  629.8958
+      [1] "Standard deviations:"
+        V2        V3        V4        V5       V6       V7        V8        V9        V10       V11       V12       V13       V14       NA
+      1  1 0.4621254 0.6885489 0.2271660 2.546322 10.49895 0.3389614 0.3974936 0.07004924 0.4121092 1.2385728 0.1164826 0.3570766 221.5208
+      2  2 0.5379642 1.0155687 0.3154673 3.349770 16.75350 0.5453611 0.7057008 0.12396128 0.6020678 0.9249293 0.2029368 0.4965735 157.2112
+      3  3 0.5302413 1.0879057 0.1846902 2.258161 10.89047 0.3569709 0.2935041 0.12413959 0.4088359 2.3109421 0.1144411 0.2721114 115.0970
+      [1] "Sample sizes:"
+        V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 NA
+      1  1 59 59 59 59 59 59 59  59  59  59  59  59 59
+      2  2 71 71 71 71 71 71 71  71  71  71  71  71 71
+      3  3 48 48 48 48 48 48 48  48  48  48  48  48 48
+
          V2          V3          V4          V5          V6          V7          V8 
       13.1537500   3.3337500   2.4370833  21.4166667  99.3125000   1.6787500   0.7814583 
          V9         V10         V11         V12         V13         V14 
