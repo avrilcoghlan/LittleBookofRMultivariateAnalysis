@@ -329,24 +329,22 @@ prints out the mean and standard deviation of the variables for each group in yo
 
     > printMeanAndSdByGroup <- function(variables,groupvariable)
       {
-         # find out how many variables we have
-         variables <- as.data.frame(variables)
-         numvariables <- length(variables)   
-         # find out how many values the group variable can take
-         groupvariable2 <- as.factor(groupvariable[[1]])
-         levels <- levels(groupvariable2)
-         numlevels <- length(levels)
-         for (i in 1:numlevels)
-         {
-            leveli <- levels[i]
-            levelidata <- variables[groupvariable==leveli,]
-            groupsize <- nrow(levelidata)
-            print(paste("Group",leveli,"Group size:",groupsize))
-            print(paste("Group",leveli,"Means:"))
-            print(mean(levelidata))
-            print(paste("Group",leveli,"Standard Deviations:"))
-            print(sd(levelidata))
-         }
+         # within each group, find the mean of each variable
+         groupvariable <- groupvariable[,1] # ensures groupvariable is not a list
+         means <- aggregate(as.matrix(variables) ~ groupvariable, FUN = mean)
+         names(means) <- c(names(variables),names(groupvariable))
+         print(paste("Means:"))
+         print(means)
+         # within each group, find the standard deviation of each variable:
+         sds <- aggregate(as.matrix(variables) ~ groupvariable, FUN = sd)
+         names(sds) <- c(names(variables),names(groupvariable))
+         print(paste("Standard deviations:"))
+         print(sds)
+         # within each group, find the number of samples:
+         samplesizes <- aggregate(as.matrix(variables) ~ groupvariable, FUN = length)
+         names(samplesizes) <- c(names(variables),names(groupvariable))
+         print(paste("Sample sizes:"))
+         print(samplesizes)
       }
 
 To use the function "printMeanAndSdByGroup()", you first need to copy and paste it into R. The 
