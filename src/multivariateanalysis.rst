@@ -1638,11 +1638,10 @@ We can calculate the mean values of the discriminant functions for each of the t
 
     > printMeanAndSdByGroup(wine.lda.values$x,wine[1])
       [1] "Means:"
-         V1          NA        NA
+         V1         LD1       LD2
        1  1 -3.42248851  1.691674
        2  2 -0.07972623 -2.472656
        3  3  4.32473717  1.578120
-xxx
 
 We find that the mean value of the first discriminant function is -3.422489 for cultivar 1, -0.07972623 for cultivar 2,
 and 4.324737 for cultivar 3. The mid-way point between the mean values for cultivars 1 and 2 is (-3.422489-0.07972623)/2=-1.751108,
