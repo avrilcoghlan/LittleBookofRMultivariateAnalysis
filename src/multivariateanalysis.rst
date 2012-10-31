@@ -1643,14 +1643,14 @@ We can calculate the mean values of the discriminant functions for each of the t
        2  2 -0.07972623 -2.472656
        3  3  4.32473717  1.578120
 
-We find that the mean value of the first discriminant function is -3.422489 for cultivar 1, -0.07972623 for cultivar 2,
-and 4.324737 for cultivar 3. The mid-way point between the mean values for cultivars 1 and 2 is (-3.422489-0.07972623)/2=-1.751108,
-and the mid-way point between the mean values for cultivars 2 and 3 is (-0.07972623+4.324737)/2 = 2.122505.
+We find that the mean value of the first discriminant function is -3.42248851 for cultivar 1, -0.07972623 for cultivar 2,
+and 4.32473717 for cultivar 3. The mid-way point between the mean values for cultivars 1 and 2 is (-3.42248851-0.07972623)/2=-1.751107,
+and the mid-way point between the mean values for cultivars 2 and 3 is (-0.07972623+4.32473717)/2 = 2.122505.
 
 Therefore, we can use the following allocation rule:
 
-* if the first discriminant function is <= -1.751108, predict the sample to be from cultivar 1
-* if the first discriminant function is > -1.751108 and <= 2.122505, predict the sample to be from cultivar 2
+* if the first discriminant function is <= -1.751107, predict the sample to be from cultivar 1
+* if the first discriminant function is > -1.751107 and <= 2.122505, predict the sample to be from cultivar 2
 * if the first discriminant function is > 2.122505, predict the sample to be from cultivar 3
 
 We can examine the accuracy of this allocation rule by using the "calcAllocationRuleAccuracy()" function below:
@@ -1704,15 +1704,15 @@ rule for the first discriminant function, we type:
 
 ::
 
-    > calcAllocationRuleAccuracy(wine.lda.values$x[,1], wine[1], c(-1.751108, 2.122505))
-      [1] "Number of samples of group 1 classified as group 1  :  56 (cutoffs: -1.751108 , NA )"
-      [1] "Number of samples of group 1 classified as group 2  :  3 (cutoffs: -1.751108 , 2.122505 )"
+    > calcAllocationRuleAccuracy(wine.lda.values$x[,1], wine[1], c(-1.751107, 2.122505))
+      [1] "Number of samples of group 1 classified as group 1  :  56 (cutoffs: -1.751107 , NA )"
+      [1] "Number of samples of group 1 classified as group 2  :  3 (cutoffs: -1.751107 , 2.122505 )"
       [1] "Number of samples of group 1 classified as group 3  :  NA (cutoffs: 2.122505 , NA )"
-      [1] "Number of samples of group 2 classified as group 1  :  5 (cutoffs: -1.751108 , NA )"
-      [1] "Number of samples of group 2 classified as group 2  :  65 (cutoffs: -1.751108 , 2.122505 )"
+      [1] "Number of samples of group 2 classified as group 1  :  5 (cutoffs: -1.751107 , NA )"
+      [1] "Number of samples of group 2 classified as group 2  :  65 (cutoffs: -1.751107 , 2.122505 )"
       [1] "Number of samples of group 2 classified as group 3  :  1 (cutoffs: 2.122505 , NA )"
-      [1] "Number of samples of group 3 classified as group 1  :  NA (cutoffs: -1.751108 , NA )"
-      [1] "Number of samples of group 3 classified as group 2  :  NA (cutoffs: -1.751108 , 2.122505 )"
+      [1] "Number of samples of group 3 classified as group 1  :  NA (cutoffs: -1.751107 , NA )"
+      [1] "Number of samples of group 3 classified as group 2  :  NA (cutoffs: -1.751107 , 2.122505 )"
       [1] "Number of samples of group 3 classified as group 3  :  48 (cutoffs: 2.122505 , NA )"
 
 This can be displayed in a "confusion matrix":
