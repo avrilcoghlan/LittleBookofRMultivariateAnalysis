@@ -330,7 +330,7 @@ prints out the mean and standard deviation of the variables for each group in yo
     > printMeanAndSdByGroup <- function(variables,groupvariable)
       {
          # find the names of the variables
-         variablenames <- c(names(groupvariable),names(variables))
+         variablenames <- c(names(groupvariable),names(as.data.frame(variables)))
          # within each group, find the mean of each variable
          groupvariable <- groupvariable[,1] # ensures groupvariable is not a list
          means <- aggregate(as.matrix(variables) ~ groupvariable, FUN = mean)
@@ -1076,22 +1076,12 @@ standardised concentration variables in each cultivar, using the "printMeanAndSd
 ::
 
     > printMeanAndSdByGroup(standardisedconcentrations,wine[1])
-      [1] "Group 1 Means:"
-        V2         V3         V4         V5         V6         V7         V8 
-      0.9166093 -0.2915199  0.3246886 -0.7359212  0.4619232  0.8709055  0.9541923 
-        V9        V10        V11        V12        V13        V14 
-      -0.5773564  0.5388633  0.2028288  0.4575567  0.7691811  1.1711967 
-      [1] "Group 2 Means:"
-         V2          V3          V4          V5          V6          V7          V8 
-      -0.88921161 -0.36134241 -0.44370614  0.22250941 -0.36354162 -0.05790375  0.05163434 
-         V9         V10         V11         V12         V13         V14 
-      0.01452785  0.06880790 -0.85039994  0.43239084  0.24460431 -0.72207310 
-      [1] "Group 3 Means:"
-         V2          V3          V4          V5          V6          V7          V8 
-      0.18862653  0.89281222  0.25721896  0.57544128 -0.03004191 -0.98483874 -1.24923710 
-         V9         V10         V11         V12         V13         V14 
-      0.68817813 -0.76413110  1.00857281 -1.20199161 -1.30726231 -0.37152953 
-
+      [1] "Means:"
+        V1         V2         V3         V4         V5          V6          V7          V8          V9        V10        V11        V12        V13        V14
+      1  1  0.9166093 -0.2915199  0.3246886 -0.7359212  0.46192317  0.87090552  0.95419225 -0.57735640  0.5388633  0.2028288  0.4575567  0.7691811  1.1711967
+      2  2 -0.8892116 -0.3613424 -0.4437061  0.2225094 -0.36354162 -0.05790375  0.05163434  0.01452785  0.0688079 -0.8503999  0.4323908  0.2446043 -0.7220731
+      3  3  0.1886265  0.8928122  0.2572190  0.5754413 -0.03004191 -0.98483874 -1.24923710  0.68817813 -0.7641311  1.0085728 -1.2019916 -1.3072623 -0.3715295
+      
 Does it make sense that the first principal component can separate cultivar 1 from cultivar 3?
 In cultivar 1, the mean values of V8 (0.954), V7 (0.871), V13 (0.769), V10 (0.539), V12 (0.458) and V14 (1.171)
 are very high compared to the mean values of V9 (-0.577), V3 (-0.292) and V5 (-0.736).
@@ -1647,15 +1637,12 @@ We can calculate the mean values of the discriminant functions for each of the t
 ::
 
     > printMeanAndSdByGroup(wine.lda.values$x,wine[1])
-      [1] "Group 1 Means:"
-         LD1       LD2 
-      -3.422489  1.691674 
-      [1] "Group 2 Means:"
-         LD1         LD2 
-      -0.07972623 -2.47265573 
-      [1] "Group 3 Means:"
-         LD1      LD2 
-      4.324737 1.578120 
+      [1] "Means:"
+         V1          NA        NA
+       1  1 -3.42248851  1.691674
+       2  2 -0.07972623 -2.472656
+       3  3  4.32473717  1.578120
+xxx
 
 We find that the mean value of the first discriminant function is -3.422489 for cultivar 1, -0.07972623 for cultivar 2,
 and 4.324737 for cultivar 3. The mid-way point between the mean values for cultivars 1 and 2 is (-3.422489-0.07972623)/2=-1.751108,
