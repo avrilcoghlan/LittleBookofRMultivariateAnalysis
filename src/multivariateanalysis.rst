@@ -358,30 +358,20 @@ for each of the 13 chemical concentrations, for each of the three different wine
 
     > printMeanAndSdByGroup(wine[2:14],wine[1])
       [1] "Means:"
-        V2       V3       V4       V5       V6       V7       V8        V9      V10      V11      V12       V13      V14        NA
+        V1       V2       V3       V4       V5       V6       V7        V8       V9      V10      V11       V12      V13       V14
       1  1 13.74475 2.010678 2.455593 17.03729 106.3390 2.840169 2.9823729 0.290000 1.899322 5.528305 1.0620339 3.157797 1115.7119
       2  2 12.27873 1.932676 2.244789 20.23803  94.5493 2.258873 2.0808451 0.363662 1.630282 3.086620 1.0562817 2.785352  519.5070
       3  3 13.15375 3.333750 2.437083 21.41667  99.3125 1.678750 0.7814583 0.447500 1.153542 7.396250 0.6827083 1.683542  629.8958
       [1] "Standard deviations:"
-        V2        V3        V4        V5       V6       V7        V8        V9        V10       V11       V12       V13       V14       NA
+        V1        V2        V3        V4       V5       V6        V7        V8         V9       V10       V11       V12       V13      V14
       1  1 0.4621254 0.6885489 0.2271660 2.546322 10.49895 0.3389614 0.3974936 0.07004924 0.4121092 1.2385728 0.1164826 0.3570766 221.5208
       2  2 0.5379642 1.0155687 0.3154673 3.349770 16.75350 0.5453611 0.7057008 0.12396128 0.6020678 0.9249293 0.2029368 0.4965735 157.2112
       3  3 0.5302413 1.0879057 0.1846902 2.258161 10.89047 0.3569709 0.2935041 0.12413959 0.4088359 2.3109421 0.1144411 0.2721114 115.0970
       [1] "Sample sizes:"
-        V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 NA
-      1  1 59 59 59 59 59 59 59  59  59  59  59  59 59
-      2  2 71 71 71 71 71 71 71  71  71  71  71  71 71
-      3  3 48 48 48 48 48 48 48  48  48  48  48  48 48
-
-         V2          V3          V4          V5          V6          V7          V8 
-      13.1537500   3.3337500   2.4370833  21.4166667  99.3125000   1.6787500   0.7814583 
-         V9         V10         V11         V12         V13         V14 
-      0.4475000   1.1535417   7.3962500   0.6827083   1.6835417 629.8958333 
-      [1] "Group 3 Standard Deviations:"
-         V2          V3          V4          V5          V6          V7          V8 
-      0.5302413   1.0879057   0.1846902   2.2581609  10.8904726   0.3569709   0.2935041 
-         V9         V10         V11         V12         V13         V14 
-      0.1241396   0.4088359   2.3109421   0.1144411   0.2721114 115.0970432 
+        V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14
+      1  1 59 59 59 59 59 59 59 59  59  59  59  59  59
+      2  2 71 71 71 71 71 71 71 71  71  71  71  71  71
+      3  3 48 48 48 48 48 48 48 48  48  48  48  48  48
 
 The function "printMeanAndSdByGroup()" also prints out the number of samples in each group. In this case,
 we see that there are 59 samples of cultivar 1, 71 of cultivar 2, and 48 of cultivar 3.
@@ -1795,7 +1785,7 @@ which I have used in the examples in this booklet.
 
 Thank you to the following users for very helpful comments: to Rich O'Hara and Patrick Hausmann for pointing 
 out that sd(<data.frame>) and mean(<data.frame>) is deprecated; to Arnau Serra-Cayuela for pointing out a typo
-in the LDA section.
+in the LDA section; to John Christie for suggesting a more compact form for my printMeanAndSdByGroup() function.
 
 Contact
 -------
