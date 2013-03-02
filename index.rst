@@ -8,7 +8,7 @@ Email: a.coghlan@ucc.ie
 This is a simple introduction to multivariate analysis using the R statistics software.
 
 There is a pdf version of this booklet available at:
-`https://github.com/avrilcoghlan/LittleBookofRMultivariateAnalysis/raw/master/_build/latex/MultivariateAnalysis.pdf <https://github.com/avrilcoghlan/LittleBookofRMultivariateAnalysis/raw/master/_build/latex/MultivariateAnalysis.pdf>`_.
+`https://media.readthedocs.org/pdf/little-book-of-r-for-multivariate-analysis/latest/little-book-of-r-for-multivariate-analysis.pdf <https://media.readthedocs.org/pdf/little-book-of-r-for-multivariate-analysis/latest/little-book-of-r-for-multivariate-analysis.pdf>`_.
 
 If you like this booklet, you may also like to check out my booklet on using
 R for biomedical statistics,  
