@@ -1776,8 +1776,8 @@ in the LDA section; to John Christie for suggesting a more compact form for my p
 Contact
 -------
 
-I will be grateful if you will send me (`Avril Coghlan <http://www.ucc.ie/microbio/avrilcoghlan/>`_) corrections or suggestions for improvements to
-my email address a.coghlan@ucc.ie 
+I will be grateful if you will send me (`Avril Coghlan <http://www.sanger.ac.uk/research/projects/parasitegenomics/>`_) corrections or suggestions for improvements to
+my email address alc@sanger.ac.uk
 
 License
 -------
