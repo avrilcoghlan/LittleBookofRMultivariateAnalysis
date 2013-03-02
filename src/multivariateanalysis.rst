@@ -722,16 +722,17 @@ in the wine samples, and to print out the top 10 pairwise correlation coefficien
 ::
 
     > mosthighlycorrelated(wine[2:14], 10)
-      [1] "i= 1 variables V7 and V8 correlation= 0.864563500095115"
-      [1] "i= 2 variables V8 and V13 correlation= 0.787193901866952"
-      [1] "i= 3 variables V7 and V13 correlation= 0.699949364791186"
-      [1] "i= 4 variables V8 and V10 correlation= 0.652691768607515"
-      [1] "i= 5 variables V2 and V14 correlation= 0.643720037178213"
-      [1] "i= 6 variables V7 and V10 correlation= 0.612413083780036"
-      [1] "i= 7 variables V12 and V13 correlation= 0.565468293182659"
-      [1] "i= 8 variables V3 and V12 correlation= -0.561295688664945"
-      [1] "i= 9 variables V2 and V11 correlation= 0.546364195083704"
-      [1] "i= 10 variables V8 and V12 correlation= 0.54347856648999"
+          First.Variable Second.Variable Correlation
+      84              V7              V8   0.8645635
+      150             V8             V13   0.7871939
+      149             V7             V13   0.6999494
+      111             V8             V10   0.6526918
+      157             V2             V14   0.6437200
+      110             V7             V10   0.6124131
+      154            V12             V13   0.5654683
+      132             V3             V12  -0.5612957
+      118             V2             V11   0.5463642
+      137             V8             V12   0.5434786
 
 This tells us that the pair of variables with the highest linear correlation coefficient are
 V7 and V8 (correlation = 0.86 approximately). 
