@@ -398,8 +398,7 @@ chemical's concentration), we can use the function "calcWithinGroupsVariance()" 
             leveli <- levels[i]
             levelidata <- variable[groupvariable==leveli,]
             levelilength <- length(levelidata)
-            # get the mean and standard deviation for group i:
-            meani <- mean(levelidata)
+            # get the standard deviation for group i:
             sdi <- sd(levelidata)
             numi <- (levelilength - 1)*(sdi * sdi)
             denomi <- levelilength
