@@ -1,9 +1,9 @@
 Welcome to a Little Book of R for Multivariate Analysis!
 ========================================================
 
-By `Avril Coghlan <http://www.ucc.ie/microbio/avrilcoghlan/>`_,
-University College Cork, Cork, Ireland. 
-Email: a.coghlan@ucc.ie
+By `Avril Coghlan <http://www.sanger.ac.uk/research/projects/parasitegenomics/>`_,
+Wellcome Trust Sanger Institute, Cambridge, U.K. 
+Email: alc@sanger.ac.uk
 
 This is a simple introduction to multivariate analysis using the R statistics software.
 
