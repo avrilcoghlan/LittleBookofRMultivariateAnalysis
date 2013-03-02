@@ -20,7 +20,7 @@ In the examples in this booklet, I will be using data sets from the UCI Machine
 Learning Repository, `http://archive.ics.uci.edu/ml <http://archive.ics.uci.edu/ml>`_.
 
 There is a pdf version of this booklet available at
-`https://github.com/avrilcoghlan/LittleBookofRTimeSeries/ raw/master/_build/latex/MultivariateAnalysis.pdf <https://github.com/avrilcoghlan/LittleBookofRTimeSeries/raw/master/_build/latex/MultivariateAnalysis.pdf>`_.
+`https://media.readthedocs.org/pdf/little-book-of-r-for-multivariate-analysis/latest/little-book-of-r-for-multivariate-analysis.pdf <https://media.readthedocs.org/pdf/little-book-of-r-for-multivariate-analysis/latest/little-book-of-r-for-multivariate-analysis.pdf>`_.
 
 If you like this booklet, you may also like to check out my booklet on using
 R for biomedical statistics, 
