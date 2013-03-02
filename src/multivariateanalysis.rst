@@ -703,29 +703,12 @@ very easily which pair of variables are most highly correlated.
          # so they will not be reported as the highest ones:
          diag(cormatrix) <- 0
          cormatrix[lower.tri(cormatrix)] <- 0
-         # find the dimensions of the matrix, and the row names:
-         numrows <- nrow(cormatrix)
-         therownames <- rownames(cormatrix)
-         # find the highest correlations
-         sorted <- sort(abs(cormatrix),decreasing=TRUE)
-         for (i in 1:numtoreport)
-         {
-            corri <- sorted[i]
-            # find the pair of variables with this correlation
-            for (j in 1:(numrows-1))
-            {
-               for (k in (j+1):numrows)
-               {
-                  corrjk <- cormatrix[j,k]
-                  if (corri == abs(corrjk))
-                  {
-                     rowname <- therownames[j]
-                     colname <- therownames[k]
-                     print(paste("i=",i,"variables",rowname,"and",colname,"correlation=",corrjk))
-                  }
-               }
-            }
-         }
+         # flatten the matrix into a dataframe for easy sorting
+         fm <- as.data.frame(as.table(cormatrix))
+         # assign human-friendly names 
+         names(fm) <- c("First.Variable", "Second.Variable","Correlation")
+         # sort and print the top n correlations
+         head(fm[order(abs(fm$Correlation),decreasing=T),],n=numtoreport)  
       }
 
 To use this function, you will first have to copy and paste it into R. The arguments of the function
@@ -1771,7 +1754,8 @@ which I have used in the examples in this booklet.
 
 Thank you to the following users for very helpful comments: to Rich O'Hara and Patrick Hausmann for pointing 
 out that sd(<data.frame>) and mean(<data.frame>) is deprecated; to Arnau Serra-Cayuela for pointing out a typo
-in the LDA section; to John Christie for suggesting a more compact form for my printMeanAndSdByGroup() function.
+in the LDA section; to John Christie for suggesting a more compact form for my printMeanAndSdByGroup() function,
+and to Rama Ramakrishnan for suggesting a more compact form for my mosthighlycorrelated() function.
 
 Contact
 -------
